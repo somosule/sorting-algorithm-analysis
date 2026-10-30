@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Results ARE committed: the brief requires result files (tables and plots) in the repo.
+# housing.csv IS committed: the brief says to keep it in the same folder as the code.
