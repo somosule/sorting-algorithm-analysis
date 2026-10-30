@@ -1,0 +1,63 @@
+# Requirements checklist
+
+Every requirement in the Project 2 brief, mapped to its task in the team plan. Tick a box when the work is merged to `main` and tested, or written into the final report.
+
+**Requirements come from the brief. The plan is checked against the brief, never the reverse.**
+
+## Code and data (Sections 2-4.1)
+- [ ] Bubble, selection and merge sort implemented from scratch → P2 · Patrick
+- [ ] Standard library only; sorted() used only to verify → P3 · Patrick
+- [ ] housing.csv read with the csv module; selected columns converted to float → P1 · Patrick
+- [ ] Code reports rows, missing values and distinct values per selected column → H1 · Henrietta
+- [ ] Same input for all three algorithms; original input unchanged → H2 · Henrietta
+- [ ] Comparisons and writes counted exactly as defined → P2 · Patrick
+- [ ] Bubble early termination; selection swaps only when needed; merge uses <= → P2 · Patrick
+- [ ] perf_counter timing with loading excluded; every output checked against sorted() → P3 · Patrick
+
+## Scaling (4.2)
+- [ ] Increasing sizes plus n = 5, 10, 20, seed recorded, same sample for all three → P4 · Patrick
+- [ ] Median of 5+ timings; loop of many calls for very small n; counts identical across repeats → P4 · Patrick
+- [ ] Q3 Growth factor when n doubles vs theory, and why they differ → H4 · Henrietta
+- [ ] Q4 Bubble sort estimate for 20,640 values, working and assumptions shown → H4 · Henrietta
+- [ ] Q5 Size where merge sort's advantage appears; why less visible for small n → H5 · Henrietta
+
+## Input order (4.3)
+- [ ] Random, sorted (own implementation), reverse, nearly sorted; n ≥ 1,000; seeds recorded → P5 · Patrick
+- [ ] Q6 Bubble on sorted: about n - 1 comparisons, no swaps → H6 · Henrietta
+- [ ] Q7 Selection: about n(n - 1)/2 comparisons even when sorted → H6 · Henrietta
+- [ ] Q8 Merge comparisons change less with input order → H6 · Henrietta
+- [ ] Q9 Best algorithm per order, 2-3 sentences each → H6 · Henrietta
+- [ ] Q10 Bubble's worst arrangement and why → H6 · Henrietta
+- [ ] Q11 Early termination on nearly sorted input → H6 · Henrietta
+
+## Repeated values (4.4)
+- [ ] Three columns, same n and seed; distinct values, most frequent count, values occurring more than once → P6 · Patrick
+- [ ] Q12 Duplication effects vs order or implementation effects → H7 · Henrietta
+
+## Decision guide (4.5)
+- [ ] Evidence for all 6 situations → H7 · Henrietta
+- [ ] Table complete in the report, based on measurements not Big-O alone → S6 · Sarah
+
+## Reflection (4.6)
+- [ ] Q13 Bubble vs selection on sorted input → H8 · Henrietta
+- [ ] Q14 A realistic reason to choose bubble or selection sort → H8 · Henrietta
+- [ ] Q15 Two or more reasons doubling is not exactly 4x or 2x → H8 · Henrietta
+- [ ] Q16 Merge sort's extra memory and the choice of algorithm → H8 · Henrietta
+- [ ] Q17 Why the same input and measurement method matter → H8 · Henrietta
+
+## Repository (Section 5)
+- [ ] Source code, result files (tables and plots) → H3 · Henrietta
+- [ ] README: obtaining housing.csv, running the code, reading the outputs → P8 · Patrick
+- [ ] Fresh clone reproduces identical counts → A2 · All
+
+## Report (Section 5)
+- [ ] Max 10 pages excl. references, peer form, appendix; single column; Arial 11 → S4 · Sarah
+- [ ] Key questions, algorithms, implementation, counting conventions, results, extrapolation → S5, S6 · Sarah
+- [ ] Answers to all 17 questions, decision guide, limitations, conclusions → S6 · Sarah
+- [ ] Design-flow diagram or key subroutines → P9 · Patrick
+- [ ] GitHub repository link → S8 · Sarah
+- [ ] Peer-assessment form, percentages sum to 100, all signed → A4 · All
+
+## Presentation and submission
+- [ ] About 15 minutes + 5 minutes Q&A; every member presents → A5 · All
+- [ ] One PDF on Canvas by Mon 16 Nov 2026, 11:59 p.m. EST → S9 · Sarah
