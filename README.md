@@ -1,7 +1,8 @@
 # Sorting Algorithm Analysis
 
-DATA 5010 - Group Project 2 · Bowling Green State University · Fall 2026
-Team: Henrietta, Patrick, Sarah
+**DATA 5010 - Group Project 2** · Bowling Green State University · Fall 2026
+
+**Team:** Henrietta, Patrick, Sarah
 
 We implement bubble sort, selection sort and merge sort from scratch in Python, count their comparisons and writes, time them, and compare them across input sizes, input orders and columns with different amounts of duplication. The results support a decision guide recommending an algorithm for each situation.
 
