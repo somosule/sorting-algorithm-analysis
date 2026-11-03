@@ -6,6 +6,8 @@ Each function copies its input, never changes it, and returns
 Counting rules (brief Section 4.1):
 - Comparison: two data values compared. Loop and index checks are not counted.
 - Write: a value stored into a list position. A swap is 2 writes and 1 swap.
+- Passes: bubble adds 1 at the start of each pass, including the last pass with no swaps; 
+  selection counts each outer-loop step (n - 1); merge is always 0.
 - Merge sort: each value placed into the merged output is 1 write, leftovers included.
   Slicing copies and the initial copy of the input are not counted.
 No list.sort() or sorted() here.
