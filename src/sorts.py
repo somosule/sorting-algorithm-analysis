@@ -1,7 +1,7 @@
 """Bubble, selection and merge sort with operation counters.
 
 Each function copies its input, never changes it, and returns
-(sorted_list, stats) where stats = {"comparisons": int, "writes": int, "swaps": int}.
+(sorted_list, stats) where stats = {"comparisons": int, "writes": int, "swaps": int, "passes": int}.
 
 Counting rules (brief Section 4.1):
 - Comparison: two data values compared. Loop and index checks are not counted.
