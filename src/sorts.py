@@ -17,6 +17,7 @@ def _new_stats():
 
 
 def bubble_sort(values):
+    """Compare a[j] > a[j + 1]; each pass is one shorter; stop after a pass with no swaps."""
     a = list(values)
     stats = _new_stats()
 
@@ -42,6 +43,7 @@ def bubble_sort(values):
 
 
 def selection_sort(values):
+    """Find the minimum with a[j] < a[min_index]; swap only if min_index != i."""
     a = list(values)
     stats = _new_stats()
 
@@ -110,6 +112,7 @@ def _merge_sort(lst, stats):
 
 
 def merge_sort(values):
+    """Top-down recursive; when values are equal take the left one first (<=)."""
     a = list(values)
     stats = _new_stats()
 
