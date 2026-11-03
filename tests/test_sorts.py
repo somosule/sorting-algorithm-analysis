@@ -1,26 +1,25 @@
 """Correctness tests for the three sorts and duplication_stats (unittest).
-
+Run from the repo root with: python -m unittest discover -v
 """
-
-
 import random
 import unittest
 
+from src import config
 from src.data_profile import duplication_stats
 from src.sorts import ALGORITHMS, bubble_sort, merge_sort, selection_sort
 
-SEED = 42
+
 STAT_KEYS = {"comparisons", "writes", "swaps", "passes"}
 
 
 def seeded_list(n):
-
-    rng = random.Random(SEED)
+    """Return n random floats in [-100, 100], the same on every run."""
+    rng = random.Random(config.SEED)
     return [rng.uniform(-100, 100) for _ in range(n)]
 
 
 class TestSortedOutput(unittest.TestCase):
-    """Every sort returns the values in ascending order"""
+    """Every sort returns the values in ascending order (brief Section 7)."""
 
     def test_seeded_random_lists(self):
         for name, sort_fn in ALGORITHMS.items():
@@ -46,7 +45,7 @@ class TestSortedOutput(unittest.TestCase):
 
 
 class TestInputUnchanged(unittest.TestCase):
-    """The original list must not be modified"""
+    """The original list must not be modified (brief Section 4)."""
 
     def test_input_list_is_not_modified(self):
         for name, sort_fn in ALGORITHMS.items():
@@ -58,7 +57,7 @@ class TestInputUnchanged(unittest.TestCase):
 
 
 class TestReproducibleStats(unittest.TestCase):
-    """The same input gives the same counts every time"""
+    """The same input gives the same counts every time (brief Section 7)."""
 
     def test_two_calls_give_identical_stats(self):
         for name, sort_fn in ALGORITHMS.items():
@@ -76,7 +75,7 @@ class TestReproducibleStats(unittest.TestCase):
 
 
 class TestKnownCounts(unittest.TestCase):
-    """Counts worked out by hand"""
+    """Counts worked out by hand from the Section 4.1 rules."""
 
     def test_bubble_on_sorted_100(self):
         _, stats = bubble_sort(list(range(100)))
