@@ -14,7 +14,7 @@ def load_rows(path):
             return list(reader)
     except FileNotFoundError:
         raise FileNotFoundError(
-            f"File not found: {path}. Please ensure the file exists and is in the correct location. Refer to the README for more information."
+            f"housing.csv not found at: {path}. See README: Data."
         )
 
 
@@ -25,6 +25,10 @@ def load_column(path, column):
     missing: count of blank or non-numeric entries, which are skipped.
     """
     rows = load_rows(path)
+
+    # Check that the requested column exists.
+    if rows and column not in rows[0]:
+        raise KeyError(f"Column '{column}' not found in {path}.")
 
     values = []
     missing = 0
