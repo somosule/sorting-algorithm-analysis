@@ -15,7 +15,7 @@ def load_rows(path):
     except FileNotFoundError:
         raise FileNotFoundError(
             f"housing.csv not found at: {path}. See README: Data."
-        )
+        ) from None
 
 
 def load_column(path, column):
@@ -34,7 +34,7 @@ def load_column(path, column):
     missing = 0
 
     for row in rows:
-        value = row.get(column, "").strip()
+        value = (row.get(column) or "").strip()
 
         try:
             values.append(float(value))
