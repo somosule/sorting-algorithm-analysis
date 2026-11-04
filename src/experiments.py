@@ -75,7 +75,7 @@ def run_full_size():
 
     rows = [{
         "algorithm": "merge",
-        "source": config.SCALING_COLUMN,
+        "source": "measured",
         "comparisons": stats["comparisons"],
         "writes": stats["writes"],
         "swaps": stats["swaps"],

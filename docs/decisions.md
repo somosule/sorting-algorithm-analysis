@@ -35,7 +35,7 @@ Change a status to **Agreed** at the kickoff meeting.
 **Report:** State the seed and how samples and orders were generated.
 
 ## D03: Sample sizes
-**Decision:** Scaling: 5, 10, 20, 50, 100, 250, 500, 1,000, 2,000, 4,000. Input order and repeated values: n = 2,000.
+**Decision:** Scaling: 5, 10, 20, 250, 500, 1,000, 2,000, 4,000. Input order and repeated values: n = 2,000.
 **Why:** The sizes suggested in the brief; small sizes support the "n < 20" decision-guide row; 2,000 shows differences while bubble and selection sort still finish quickly.
 **Report:** List the sizes.
 
