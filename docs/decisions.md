@@ -91,12 +91,12 @@ Format:
 **Report:** State that passes is an additional count, and use it in the Q11 answer.
 
 ## D10: Lean results files plus results/run_info.csv
-**Decision:** Each results file contains only columns that change. scaling.csv: n, algorithm, comparisons, writes, swaps, passes, median_runtime_s, loop_reps. input_order.csv: order, algorithm, comparisons, writes, swaps, passes, median_runtime_s. repeated_values.csv: column, algorithm, comparisons, writes, swaps, passes, median_runtime_s, distinct_values, most_frequent_count, values_repeated. Fixed settings (seed, runs, sample size, column) plus Python version, computer and date are written once to `results/run_info.csv`. Column lists live in `config.py`.
+**Decision:** Each results file contains only columns that change. scaling.csv: n, algorithm, comparisons, writes, swaps, passes, median_runtime_s, loop_reps. input_order.csv: order, algorithm, comparisons, writes, swaps, passes, median_runtime_s. repeated_values.csv: column, algorithm, comparisons, writes, swaps, passes, median_runtime_s, distinct_values, most_frequent_count, values_repeated, elements_in_repeats (D07), equal_pairs (D20). full_size.csv: algorithm, source, comparisons, writes, swaps, passes, runtime_s, runs (D16). Fixed settings (seed, runs, sample size, column) plus Python version, computer and date are written once to `results/run_info.csv`. Column lists live in `config.py`.
 **Why:** Efficient and clearly labelled: no column repeats the same value on every row, and the run details are recorded in one place.
 **Report:** Describe the results files briefly; quote run_info.csv for the machine and Python version.
 
 ## D11: Official final run on Sarah's laptop
-**Decision:** All report timings come from one complete run of `python main.py` on Sarah's laptop at code complete (Sun 8 Nov): laptop plugged in, other apps closed, `RUN_BUBBLE_FULL` switched on once for the optional bubble check (D16). Other runs are for building and testing only.
+**Decision:** All report timings come from one complete run of `python main.py` on Sarah's laptop at code complete (Sun 8 Nov): laptop plugged in, other apps closed, `RUN_BUBBLE_FULL` switched on once for the optional bubble check (D15). Other runs are for building and testing only.
 **Why:** Runtimes differ between computers and Python versions; consistent measurement (brief Section 7) needs one machine. Sarah also runs the independent fresh-clone test.
 **Report:** Name the machine and Python version (from run_info.csv) in the implementation and limitations sections.
 
@@ -121,7 +121,7 @@ Format:
 **Report:** If done, a small table in Section 4 (estimated vs measured), with the bubble estimate's % difference.
 
 ## D16: Merge sort measured on all 20,640 values (standard)
-**Decision:** `run_full_size()` in experiments.py runs merge sort on all 20,640 median_income values, shuffled with seed 42 (5 runs, median), on every run of main.py (called after the bubble estimate, D21), and saves `results/full_size.csv` (algorithm, source, comparisons, writes, swaps, passes, runtime_s, runs). Expected: 269,952 comparisons and 297,472 writes.
+**Decision:** `run_full_size()` in experiments.py runs merge sort on all 20,640 median_income values in the order given by `random.Random(42).sample(values, 20640)`, the same `sample()` call as every other experiment (not `shuffle()`, which gives a different order and 270,271 comparisons) (5 runs, median), on every run of main.py (called after the bubble estimate, D21), and saves `results/full_size.csv` (algorithm, source, comparisons, writes, swaps, passes, runtime_s, runs). Expected: 269,952 comparisons and 297,472 writes.
 **Why:** Our largest scaling sample is 4,000, so without this the decision guide's "Large random input" row would rest on n = 4,000 and an estimate. Merge sort at full size takes under a second, so a real measurement costs nothing.
 **Report:** Cite it in the decision guide (Section 7) and next to the bubble estimate in Q4.
 

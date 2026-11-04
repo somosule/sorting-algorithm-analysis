@@ -9,7 +9,7 @@ Every requirement in the Project 2 brief, mapped to its task in the team plan. T
 - [ ] Standard library only; sorted() used only to verify → P3 · Patrick
 - [x] housing.csv read with the csv module; selected columns converted to float → P1 · Patrick
 - [x] Code reports rows, missing values and distinct values per selected column → H1 · Henrietta
-- [ ] Same input for all three algorithms; original input unchanged → H2 · Henrietta
+- [x] Same input for all three algorithms; original input unchanged → H2 · Henrietta
 - [x] Comparisons and writes counted exactly as defined → P2 · Patrick
 - [x] Passes counted as an extra measure (D09) → P2 · Patrick
 - [ ] Loader and data profile independently tested → S13 · Sarah
@@ -22,7 +22,7 @@ Every requirement in the Project 2 brief, mapped to its task in the team plan. T
 - [ ] Median of 5+ timings; loop of many calls for very small n; counts identical across repeats → P4 · Patrick
 - [ ] Q3 Growth factor when n doubles vs theory, and why they differ → H4 · Henrietta
 - [ ] Q4 Bubble sort estimate for 20,640 values, working and assumptions shown → H4 · Henrietta
-- [ ] Optional bubble check on 20,640 values, run only after the estimate (D21) → P12 · Patrick
+- [ ] Optional bubble check on 20,640 values, run only after the estimate (D15; call order D21) → P12 · Patrick
 - [ ] Q5 Size where merge sort's advantage appears; why less visible for small n → H5 · Henrietta
 
 ## Input order (4.3)
