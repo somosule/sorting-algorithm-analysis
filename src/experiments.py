@@ -3,7 +3,7 @@
 import random
 
 from src import config
-from src.data_loader import load_column
+from src.load_data import load_column
 from src.sorts import ALGORITHMS
 from src.measure import run_algorithm, write_results
 

@@ -80,7 +80,7 @@ def run_algorithm(sort_fn, values):
     return statistics.median(times), first_stats, loop_reps
 
 
-def write_results(rows, filename, columns=config.RESULT_COLUMNS):
+def write_results(rows, filename, columns):
     """Write rows (list of dicts) to results/<filename>."""
 
     # Make sure the results directory exists.
