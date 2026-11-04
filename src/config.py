@@ -15,7 +15,7 @@ COLUMNS = ("median_income", "housing_median_age", "median_house_value")
 SCALING_COLUMN = "median_income"  # few duplicates, so they do not confound 4.2 and 4.3
 
 # Scaling experiment (4.2): very small sizes support the "n < 20" decision-guide row.
-SCALING_SIZES = (5, 10, 20, 250, 500, 1000, 2000, 4000)
+SCALING_SIZES = (5, 10, 20, 50, 100, 250, 500, 1000, 2000, 4000)
 
 # Input-order (4.3) and repeated-values (4.4) sample size.
 ORDER_N = 2000
@@ -32,14 +32,53 @@ FULL_SIZE = 20640
 # Algorithm names used in every results file.
 ALGORITHM_NAMES = ("bubble", "selection", "merge")
 
-# Columns of every experiment results CSV.
-RESULT_COLUMNS = (
-    "experiment", "column", "order", "n", "algorithm",
-    "comparisons", "writes", "swaps",
-    "median_runtime_s", "runs", "loop_reps", "seed",
+# Columns for each experiment's results CSV.
+SCALING_COLUMNS = (
+    "n",
+    "algorithm",
+    "comparisons",
+    "writes",
+    "swaps",
+    "passes",
+    "median_runtime_s",
+    "loop_reps"
 )
-# Extra columns added in repeated_values.csv.
-DUPLICATION_COLUMNS = ("distinct_values", "most_frequent_count", "values_repeated")
+
+INPUT_ORDER_COLUMNS = (
+    "order",
+    "algorithm",
+    "comparisons",
+    "writes",
+    "swaps",
+    "passes",
+    "median_runtime_s"
+)
+
+REPEATED_COLUMNS = (
+    "column",
+    "algorithm",
+    "comparisons",
+    "writes",
+    "swaps",
+    "passes",
+    "median_runtime_s",
+    "distinct_values",
+    "most_frequent_count",
+    "values_repeated",
+    "elements_in_repeats",
+    "equal_pairs"
+)
+
+FULL_SIZE_COLUMNS = (
+    "algorithm",
+    "source",
+    "comparisons",
+    "writes",
+    "swaps",
+    "passes",
+    "runtime_s",
+    "runs"
+)
 
 # Optional extension: look up original records after sorting (not part of the timed experiments).
 RUN_RECORD_LOOKUP = False
