@@ -90,7 +90,7 @@ def write_results(rows, filename, columns):
     filepath = config.RESULTS_DIR / filename
 
     # Write the CSV file.
-    with open(filepath, "w", newline="") as f:
+    with open(filepath, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()
         writer.writerows(rows)

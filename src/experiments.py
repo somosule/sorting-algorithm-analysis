@@ -64,6 +64,28 @@ def run_scaling():
         columns=config.SCALING_COLUMNS
     )
 
+def run_full_size():
+    """Run merge sort on all 20,640 median_income values."""
+
+    values, _ = load_column(config.DATA_PATH, config.SCALING_COLUMN)
+
+    data = random.Random(config.SEED).sample(values, len(values))
+
+    runtime, stats, _ = run_algorithm(ALGORITHMS["merge"], data)
+
+    rows = [{
+        "algorithm": "merge",
+        "source": config.SCALING_COLUMN,
+        "comparisons": stats["comparisons"],
+        "writes": stats["writes"],
+        "swaps": stats["swaps"],
+        "passes": stats["passes"],
+        "runtime_s": runtime,
+        "runs": config.REPEATS
+    }]
+
+    write_results(rows, "full_size.csv", config.FULL_SIZE_COLUMNS)
+
 
 def build_orders(base):
     """Section 4.3: return four different input orders from base."""
