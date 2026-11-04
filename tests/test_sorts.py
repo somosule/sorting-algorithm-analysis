@@ -134,6 +134,7 @@ class TestDuplicationStats(unittest.TestCase):
         self.assertEqual(result["most_frequent_count"], 1)
         self.assertEqual(result["values_repeated"], 0)
         self.assertEqual(result["elements_in_repeats"], 0)
+        self.assertEqual(result["equal_pairs"], 0)
 
 
 if __name__ == "__main__":
