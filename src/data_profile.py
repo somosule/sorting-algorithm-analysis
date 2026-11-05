@@ -1,4 +1,4 @@
-"""Dataset profile (brief Section 3) and duplication statistics (Section 4.4).
+"""Dataset profile and duplication statistics 
 
 profile_dataset() describes the full file exactly as loaded, before any
 sampling or sorting. duplication_stats() is reused by the repeated-values
@@ -41,20 +41,22 @@ def profile_dataset(path):
 
 def duplication_stats(values):
     """Return a dict with distinct_values, most_frequent_value, most_frequent_count,
-    values_repeated (distinct values appearing more than once) and
-    elements_in_repeats (entries belonging to those values)."""
+    values_repeated (distinct values appearing more than once),
+    elements_in_repeats (entries belonging to those values) and
+    equal_pairs (pairs of equal values)."""
     counts = {}
     for value in values:
         counts[value] = counts.get(value, 0) + 1
 
     most_frequent_value, most_frequent_count = None, 0
-    values_repeated, elements_in_repeats = 0, 0
+    values_repeated, elements_in_repeats, equal_pairs = 0, 0, 0
     for value, count in counts.items():
         if count > most_frequent_count:  # on a tie, the first value seen wins
             most_frequent_value, most_frequent_count = value, count
         if count > 1:
             values_repeated += 1
             elements_in_repeats += count
+        equal_pairs += count * (count - 1) // 2  # pairs of equal values
 
     return {
         "distinct_values": len(counts),
@@ -62,6 +64,7 @@ def duplication_stats(values):
         "most_frequent_count": most_frequent_count,
         "values_repeated": values_repeated,
         "elements_in_repeats": elements_in_repeats,
+        "equal_pairs": equal_pairs,
     }
 
 
