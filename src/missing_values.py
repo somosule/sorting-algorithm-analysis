@@ -4,11 +4,12 @@ Kept separate from the main results: housing.csv is never changed, the
 experiments never use total_bedrooms, and the estimates are written only to
 their own results files.
 
-Method (ratio-based imputation, not interpolation): total_bedrooms is closely
-related to total_rooms, so each blank is estimated as that row's total_rooms
-times the median bedrooms-per-room ratio of its ocean_proximity group.
-Forward or back fill is not used because rows are independent areas, and a
-single median fill would give every blank the same value.
+Method: ratio imputation (an estimate from a related column, not
+interpolation). Each blank = that row's households x the median
+bedrooms-per-household ratio of its ocean_proximity group. households is used
+because it tracks total_bedrooms most closely (correlation 0.98); the accuracy
+check below confirms it beats a ratio to total_rooms and a single median fill.
+Forward or back fill is not used because rows are independent areas.
 
 Medians are found with our own merge_sort, never sorted().
 """
@@ -19,68 +20,128 @@ from src.data_profile import duplication_stats
 from src.load_data import load_rows
 from src.sorts import merge_sort
 
+TARGET = "total_bedrooms"
+AUXILIARY = "households"          # related column used for the estimate
+GROUP = "ocean_proximity"
+
 FILLED_FILE = "total_bedrooms_filled.csv"
-FILLED_FIELDS = ("row_number", "ocean_proximity", "total_rooms", "ratio_used", "estimate")
+FILLED_FIELDS = ("row_number", "ocean_proximity", "households", "ratio_used", "estimate")
 COMPARE_FILE = "total_bedrooms_before_after.csv"
 COMPARE_FIELDS = ("version", "values", "missing", "distinct", "min", "max", "median",
                   "most_frequent_value", "most_frequent_count", "values_repeated")
+CHECK_FILE = "total_bedrooms_method_check.csv"
+CHECK_FIELDS = ("method", "median_abs_pct_error", "share_within_10pct")
 
 
 def estimate_missing_bedrooms(path):
-    """Estimate each blank total_bedrooms value and compare with a plain median fill.
+    """Estimate each blank, compare versions and check accuracy on known values.
 
-    Saves results/total_bedrooms_filled.csv and results/total_bedrooms_before_after.csv
-    and returns the comparison rows (before, ratio fill, median fill).
+    Saves results/total_bedrooms_filled.csv, results/total_bedrooms_before_after.csv
+    and results/total_bedrooms_method_check.csv; returns the before/after rows.
     """
     rows = load_rows(path)
-    ratios = _group_ratios(rows)
+    ratios = _group_ratios(rows, AUXILIARY)
 
-    known, blanks = [], []
+    known, filled = [], []
     for number, row in enumerate(rows, start=1):  # row_number 1 = first data row
-        bedrooms = _to_float(row["total_bedrooms"])
-        if bedrooms is None:
-            blanks.append((number, row))
-        else:
+        bedrooms = _to_float(row[TARGET])
+        if bedrooms is not None:
             known.append(bedrooms)
-
-    filled = []
-    for number, row in blanks:
-        group = row["ocean_proximity"]
-        ratio = ratios.get(group, ratios["ALL"])
-        rooms = float(row["total_rooms"])
+            continue
+        ratio = ratios.get(row[GROUP], ratios["ALL"])
+        households = float(row[AUXILIARY])
         filled.append({
             "row_number": number,
-            "ocean_proximity": group,
-            "total_rooms": rooms,
+            "ocean_proximity": row[GROUP],
+            "households": households,
             "ratio_used": round(ratio, 4),
-            "estimate": int(rooms * ratio + 0.5),  # round half up
+            "estimate": _round(households * ratio),
         })
 
     median_bedrooms = _median(known)
-    ratio_version = known + [item["estimate"] for item in filled]
-    median_version = known + [median_bedrooms] * len(blanks)
-
     comparison = [
-        _summary("before (blanks skipped)", known, len(blanks)),
-        _summary("after: ratio estimate", ratio_version, 0),
-        _summary("after: single median fill", median_version, 0),
+        _summary("before (blanks skipped)", known, len(filled)),
+        _summary("after: ratio estimate (households)", known + [f["estimate"] for f in filled], 0),
+        _summary("after: single median fill", known + [median_bedrooms] * len(filled), 0),
     ]
+    check = method_check(rows)
+
     _write(FILLED_FILE, FILLED_FIELDS, filled)
     _write(COMPARE_FILE, COMPARE_FIELDS, comparison)
-    _print(comparison, len(blanks))
+    _write(CHECK_FILE, CHECK_FIELDS, check)
+    _print(comparison, check, len(filled))
     return comparison
 
 
-def _group_ratios(rows):
-    """Median total_bedrooms / total_rooms per ocean_proximity group, plus 'ALL'."""
+def method_check(rows):
+    """Hide each known total_bedrooms value, estimate it each way, and measure the error.
+
+    Returns one row per method with the median absolute % error and the share of
+    estimates within 10% of the true value.
+    """
+    known_rows = [row for row in rows if _to_float(row[TARGET]) is not None]
+    truth = [float(row[TARGET]) for row in known_rows]
+    median_bedrooms = _median(truth)
+
+    estimates = {"single median fill": [median_bedrooms] * len(known_rows)}
+    for auxiliary in ("total_rooms", "households"):
+        ratios = _group_ratios(rows, auxiliary)
+        estimates[f"ratio to {auxiliary}"] = [
+            float(row[auxiliary]) * ratios.get(row[GROUP], ratios["ALL"]) for row in known_rows
+        ]
+
+    results = []
+    for method, guesses in estimates.items():
+        errors = [abs(guess - true) / true for guess, true in zip(guesses, truth)]
+        results.append({
+            "method": method,
+            "median_abs_pct_error": round(100 * _median(errors), 1),
+            "share_within_10pct": round(100 * sum(e <= 0.10 for e in errors) / len(errors), 1),
+        })
+    return results
+
+
+def bedrooms_column(path, method="ratio"):
+    """Return (values, missing) for total_bedrooms with the blanks handled by method.
+
+    method "skip": blanks left out, as load_column does (missing = 207).
+    method "ratio": each blank = households x its group's median ratio (missing = 0).
+    method "median": each blank = the median of the known values (missing = 0).
+    Values stay in file order, so the same seed gives the same sample as load_column.
+    Used by the interactive mode (D27); housing.csv is never changed.
+    """
+    if method not in ("skip", "ratio", "median"):
+        raise ValueError("method must be 'skip', 'ratio' or 'median'")
+    rows = load_rows(path)
+    known = [b for b in (_to_float(r[TARGET]) for r in rows) if b is not None]
+    ratios = _group_ratios(rows, AUXILIARY) if method == "ratio" else None
+    median_bedrooms = _median(known) if method == "median" else None
+
+    values, missing = [], 0
+    for row in rows:
+        bedrooms = _to_float(row[TARGET])
+        if bedrooms is not None:
+            values.append(bedrooms)
+        elif method == "skip":
+            missing += 1
+        elif method == "ratio":
+            ratio = ratios.get(row[GROUP], ratios["ALL"])
+            values.append(float(_round(float(row[AUXILIARY]) * ratio)))
+        else:
+            values.append(median_bedrooms)
+    return values, missing
+
+
+def _group_ratios(rows, auxiliary):
+    """Median total_bedrooms / auxiliary per ocean_proximity group, plus 'ALL'."""
     by_group = {"ALL": []}
     for row in rows:
-        bedrooms = _to_float(row["total_bedrooms"])
-        rooms = _to_float(row["total_rooms"])
-        if bedrooms is None or not rooms:
+        bedrooms = _to_float(row[TARGET])
+        base = _to_float(row[auxiliary])
+        if bedrooms is None or not base:
             continue
-        ratio = bedrooms / rooms
-        by_group.setdefault(row["ocean_proximity"], []).append(ratio)
+        ratio = bedrooms / base
+        by_group.setdefault(row[GROUP], []).append(ratio)
         by_group["ALL"].append(ratio)
     return {group: _median(values) for group, values in by_group.items()}
 
@@ -92,6 +153,11 @@ def _median(values):
     if len(ordered) % 2:
         return ordered[mid]
     return (ordered[mid - 1] + ordered[mid]) / 2
+
+
+def _round(value):
+    """Round half up to a whole number of bedrooms."""
+    return int(value + 0.5)
 
 
 def _to_float(text):
@@ -128,10 +194,14 @@ def _write(filename, fields, rows):
         writer.writerows(rows)
 
 
-def _print(comparison, blanks):
+def _print(comparison, check, blanks):
     """Short summary for the terminal."""
-    print(f"total_bedrooms what-if: {blanks} blanks estimated "
-          f"-> results/{FILLED_FILE}, results/{COMPARE_FILE}")
+    print(f"total_bedrooms what-if: {blanks} blanks estimated -> results/{FILLED_FILE}, "
+          f"results/{COMPARE_FILE}, results/{CHECK_FILE}")
     for item in comparison:
-        print(f"  {item['version']:<26} distinct {item['distinct']:>5}  "
+        print(f"  {item['version']:<36} distinct {item['distinct']:>5}  "
               f"most frequent {item['most_frequent_value']} x {item['most_frequent_count']}")
+    print("  Accuracy on known values (hidden and re-estimated):")
+    for item in check:
+        print(f"    {item['method']:<22} typical error {item['median_abs_pct_error']:>5}%  "
+              f"within 10%: {item['share_within_10pct']:>5}%")
