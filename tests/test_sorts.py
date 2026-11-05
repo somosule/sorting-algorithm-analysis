@@ -126,6 +126,7 @@ class TestDuplicationStats(unittest.TestCase):
         self.assertEqual(result["most_frequent_count"], 3)
         self.assertEqual(result["values_repeated"], 2)
         self.assertEqual(result["elements_in_repeats"], 5)
+        self.assertEqual(result["equal_pairs"], 4)
 
     def test_no_repeated_values(self):
         result = duplication_stats([1.5, 2.5, 3.5])
@@ -133,6 +134,7 @@ class TestDuplicationStats(unittest.TestCase):
         self.assertEqual(result["most_frequent_count"], 1)
         self.assertEqual(result["values_repeated"], 0)
         self.assertEqual(result["elements_in_repeats"], 0)
+        self.assertEqual(result["equal_pairs"], 0)
 
 
 if __name__ == "__main__":
