@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+dummy/
 
 # Editors and operating systems
 .vscode/
