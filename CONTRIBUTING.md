@@ -8,13 +8,15 @@ Read this and `docs/decisions.md` before starting a task. The team plan (Excel) 
 
 - Every change reaches `main` through a pull request. Nobody pushes to `main` directly.
 - One task = one branch = one pull request.
-- **Two approvals before merging:** Sarah reviews every pull request, plus the second reviewer:
+- **One approval before merging** (D26), always from someone other than the author:
 
-| Author | Second reviewer |
+| Author | Approved by |
 |---|---|
-| Patrick | Henrietta |
-| Henrietta | Patrick |
+| Patrick | Sarah |
+| Henrietta | Sarah |
 | Sarah | Patrick or Henrietta |
+
+- The other teammate is welcome to comment, and should look at any pull request their own work builds on.
 
 - The description says what changed, which task and brief section it covers, and how it was tested.
 - Review within 24 hours. Request changes with the exact line and the fix.
@@ -55,7 +57,7 @@ All tests must pass.
 ```
 BRANCH   patrick/p2-sorts
 COMMIT   P2: add bubble sort counters
-REVIEW   Sarah + second reviewer, never your own
+REVIEW   one approval, never your own (Sarah for Patrick and Henrietta)
 SETTINGS src/config.py only
 TESTS    python -m unittest discover -v
 RUN      python main.py

@@ -19,10 +19,10 @@ Format:
 | D02 | Seed 42 for every random step | Agreed (Mon 2 Nov) |
 | D03 | Sample sizes, and n = 2,000 for 4.3 and 4.4 | Agreed (Mon 2 Nov) |
 | D04 | Sort values only, not full records | Agreed (Mon 2 Nov) |
-| D05 | total_bedrooms not used in the experiments; optional ratio-based cleaning | Agreed (Mon 2 Nov); cleaning decided at Thu 5 Nov go/no-go |
+| D05 | total_bedrooms not used in the experiments; ratio imputation (households) as a what-if extension | Agreed (Mon 2 Nov); extension GO (Wed 4 Nov, D23) |
 | D06 | Counting choices beyond Section 4.1 | Agreed (Mon 2 Nov), extended Tue 3 Nov |
 | D07 | Duplication statistic definitions | Agreed (Mon 2 Nov) |
-| D08 | Optional record lookup extension | Agreed as optional; decided at Thu 5 Nov go/no-go |
+| D08 | Record lookup extension | GO (Wed 4 Nov, D23) |
 | D09 | Bubble and selection sort also count passes | Agreed (Tue 3 Nov) |
 | D10 | Lean results files plus results/run_info.csv | Agreed (Tue 3 Nov) |
 | D11 | Official final run on Sarah's laptop | Agreed (Tue 3 Nov) |
@@ -37,6 +37,11 @@ Format:
 | D20 | Equal pairs recorded for the repeated-values experiment | Proposed (Wed 4 Nov meeting) |
 | D21 | main.py call order | Proposed (Wed 4 Nov meeting) |
 | D22 | Two statements for the implementation section | Proposed (Wed 4 Nov meeting) |
+| D23 | Extensions are GO, kept separate from the main results | Agreed (Wed 4 Nov) |
+| D24 | Every table and chart titled with its fixed settings | Agreed (Wed 4 Nov) |
+| D25 | Combined charts PDF and a clickable run summary; the program stays non-interactive | Agreed (Wed 4 Nov) |
+| D26 | One approval to merge a pull request | Agreed (Thu 5 Nov) |
+| D27 | Interactive mode: python3 main.py --interactive | Agreed (Thu 5 Nov), requested by Dr Khan |
 
 ## D01: housing.csv committed in the repository root
 **Decision:** `housing.csv` sits next to `main.py` and is committed.
@@ -58,10 +63,10 @@ Format:
 **Why:** Brief Section 3, step 4. Keeps counting rules simple and identical to other groups.
 **Report:** One sentence.
 
-## D05: total_bedrooms not used in the experiments; optional ratio-based cleaning
-**Decision:** total_bedrooms is not used in the experiments. Blank or non-numeric values are counted as missing and skipped. The dataset profile reports total_bedrooms (207 blanks) as the "before" picture. Optional side analysis (`src/missing_values.py`, decided at the Thu 5 Nov go/no-go): estimate each blank as that row's total_rooms x the median bedrooms-per-room ratio for its ocean_proximity group (<1H OCEAN 0.2067, INLAND 0.1983, NEAR OCEAN 0.2071, NEAR BAY 0.2067), then report the statistics after. housing.csv is never changed.
-**Why:** Not required (brief Section 3, step 3). Forward or back fill would be wrong because rows are independent census block groups, not a time series; a single median (435) would create 207 identical values. total_bedrooms is closely related to total_rooms (correlation 0.93) and households (0.98).
-**Report:** Section 3: a short paragraph on missing values and, if done, the before-and-after table; otherwise one sentence in limitations.
+## D05: total_bedrooms not used in the experiments; ratio imputation as a what-if extension
+**Decision:** total_bedrooms is not used in the experiments. Blank or non-numeric values are counted as missing and skipped. The dataset profile reports total_bedrooms (207 blanks) as the "before" picture. What-if extension (`src/missing_values.py`, GO under D23): estimate each blank as that row's households x the median bedrooms-per-household ratio for its ocean_proximity group (<1H OCEAN 1.0410, INLAND 1.0618, NEAR OCEAN 1.0515, NEAR BAY 1.0466), compare with the blanks skipped and with a single median fill, and check accuracy by hiding known values and re-estimating them. housing.csv is never changed.
+**Why:** Not required (brief Section 3, step 3). Forward or back fill would be wrong because rows are independent census block groups, not a time series. A single median (435) is the common simple method (used for this dataset in Geron, 2019) but puts the same value everywhere (435 appears 244 times), shrinks the spread and ignores related columns. Ratio imputation within groups is a standard method in official statistics (Statistics Canada, Quality Guidelines). households was chosen over total_rooms because it tracks bedrooms most closely (correlation 0.98 vs 0.93), and the accuracy check confirms it: typical error 4.4% (82% of estimates within 10%) vs 15.4% for total_rooms and 37.7% for the median (decided Thu 5 Nov; total_rooms was the first plan).
+**Report:** Section 3: the method, the accuracy table, the before-and-after table, and one caveat: single imputation fills each blank with one best guess, so it slightly understates the natural variation (Little and Rubin, 2019). Call it imputation (an estimate), not interpolation. References in docs/references.md.
 
 ## D06: Counting choices beyond Section 4.1
 **Decision:**
@@ -138,7 +143,7 @@ Format:
 ## D19: Scaling sizes 50 and 100 added
 **Decision:** `SCALING_SIZES` becomes (5, 10, 20, 50, 100, 250, 500, 1000, 2000, 4000): 30 rows in scaling.csv. `SMALL_N_MAX` stays 20, so n = 50 and 100 are timed with single calls (median of 5). Growth factors still use the doublings from 250 upwards.
 **Why:** Without them the sizes jump from 20 to 250, so Q5 could only say merge sort overtakes "somewhere between 20 and 250". Trial runs put the crossover at about n = 20 against bubble sort and between 20 and 50 against selection sort. The extra sizes cost a fraction of a second.
-**Report:** Q1 (sizes used and why) and Q5.
+**Report:** Q1 (sizes used and why) and Q5. Describe the sizes as three groups, each answering a different question: tiny (5, 10, 20) for the very-small-list row of the decision guide; crossover (50, 100) for where merge sort overtakes (Q5); scaling (250 to 4,000) for growth factors and the bubble estimate (Q3, Q4).
 
 ## D20: Equal pairs recorded for the repeated-values experiment
 **Decision:** `duplication_stats()` also returns `equal_pairs` (pairs of equal values), saved as a column in repeated_values.csv. The repeated-values table also shows the bubble swaps a random arrangement would give, (n(n - 1)/2 - equal_pairs) / 2, and the difference from the actual swaps.
@@ -154,3 +159,35 @@ Format:
 **Decision:** The report states that (a) statistics.median, used only on the 5 timing values in measure.py, sorts those 5 numbers internally and never touches the housing data; and (b) each sort's first step copies the input, which is inside the timer but not counted as writes, and is the same for all three sorts.
 **Why:** The brief bans sorted() for processing the data and asks us to state additional implementation choices; saying this up front stops a reader from thinking either rule was broken.
 **Report:** One or two sentences in Section 2.
+
+## D23: Extensions are GO, kept separate from the main results
+**Decision:** All three extensions go ahead: the ratio-based estimate of the 207 missing total_bedrooms values (D05), the record lookup (D08) and the memory check for Q16. Each is a "what if" kept apart from the main results: housing.csv is never changed, the main experiments never use total_bedrooms, each extension writes only its own results file, and the memory check and record lookup run after all timed experiments.
+**Why:** They add depth (data preparation, sorting full records, space complexity) without putting the main, reproducible results at risk. The main counts are identical with the extension switches on or off, which is checked in the fresh-clone test (A2).
+**Report:** One short paragraph per extension (Section 3 for the estimate and record lookup, Q16 for memory), with detail in the appendix. Describe the estimate as imputation (a ratio-based estimate), not interpolation, which would fill blanks from neighbouring rows.
+
+## D24: Every table and chart titled with its fixed settings
+**Decision:** Because the results files are lean (D10), each table and chart gets a title that states, once, the settings dropped from its columns: the column used, n, seed, number of runs and how the sample was made. Example: "Input-order experiment (4.3): one median_income sample, n = 2,000, seed 42, in four versions; median of 5 runs." make_plots.py builds the titles from config.py and writes them to results/tables/captions.md; the README and the report reuse them. CSV files themselves get no title row, because a line above the header would break anything that reads them.
+**Why:** A lean table is only clear if the reader knows what is constant; the title keeps that information visible without repeating it on every row, and building it from config means it can never disagree with the code.
+**Report:** Every table and figure has a numbered title with its settings.
+
+## D25: Combined charts PDF and a clickable run summary; the program stays non-interactive
+**Decision:** make_plots.py also saves every chart into one file, results/plots/all_charts.pdf (one chart per page, matplotlib's PdfPages, no new library). main.py prints one line per step (rows, output file, time) and ends with the paths to all_charts.pdf and captions.md, which open with Cmd+click in the VS Code terminal. The program asks for no input: settings live in config.py.
+**Why:** One file to view all the visuals at the walkthrough, in Q&A and while writing, at almost no cost. A full auto-generated report was rejected: it would duplicate the written report without the analysis, add risk before code complete and earn no extra marks. No interactive input keeps every run reproducible; the brief says a command-line program is sufficient.
+**Report:** Optional sentence in Section 2: "One command runs everything and lists its outputs; all charts are also collected in results/plots/all_charts.pdf."
+
+## D26: One approval to merge a pull request
+**Decision:** A pull request needs one approval from someone other than its author: Sarah approves Patrick's and Henrietta's, and Patrick or Henrietta approves Sarah's. The other teammate comments when a pull request affects their own work. Branch protection is optional; if switched on, it requires 1 approval.
+**Why:** Two approvals on every pull request slowed merges without adding much: every change is already read in full by Sarah and checked against the tests and expected counts. Fewer waits keeps code complete on Sun 8 Nov realistic.
+**Report:** None needed; optionally one sentence in the limitations or method: every change was reviewed by a second team member before merging.
+
+## D27: Interactive mode with python3 main.py --interactive
+**Decision:** `python3 main.py` stays the full official run, with no questions: seed 42 and the brief's columns. `python3 main.py --interactive` opens a menu for exploration. Pressing Enter keeps each default.
+1. Experiment: scaling, input order or repeated values.
+2. Size: scaling by size group (a) tiny 5, 10, 20; b) crossover 50, 100; c) scaling 250 to 4,000; d) all ten, 5 to 4,000); input order and repeated values at n = 1,000, 2,000 (official, default) or 4,000. Never a free number.
+3. Seed: any whole number (default 42).
+4. Column: any of the 9 numeric columns (default: the brief's column).
+5. Only for a column with missing values (total_bedrooms): "Which version of the data?" 1) Raw data* (20,433 values, default), 2) With ratio imputation (20,640), 3) With a single median fill, for comparison (20,640), with a footnote: "* total_bedrooms has 207 missing values (1.0% of rows), left out of the raw data." Uses `bedrooms_column()` from `src/missing_values.py`.
+
+All three sorts always run, and the table shows comparisons, writes, swaps, passes and runtime. For scaling groups c) and d) it also shows the growth factors and the estimated time for the whole column, then asks one question, default No, whether to run all three sorts on the full column as a check of the estimate (about 1.5 minutes). Input order and repeated values are not offered at full size (several bubble runs would take 3 to 5 minutes). Every result is labelled as exploration; nothing is written to results/. Code in `src/interactive.py`; a test checks that the defaults reproduce `results/scaling.csv` exactly.
+**Why:** Dr Khan asked for the user to be able to enter n, the column and the seed, as in Project 1. A different seed shows whether a result comes from the algorithm or from one particular sample (Q12, Q17, the one-seed limitation); other columns show live why the brief uses median_income; question 5 shows the imputation working inside the sorting experiments. Sizes stay limited to the agreed options because scaling needs doubling sizes for the growth factors and the brief allows bubble sort at full size only as a check after an estimate. The separate option keeps the official run hands-free and reproducible.
+**Report:** One or two sentences in Section 2 (how to run the program), and a live demo option for the presentation or Q&A.
