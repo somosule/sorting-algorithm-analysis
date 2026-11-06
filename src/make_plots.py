@@ -48,7 +48,8 @@ plt.rcParams.update({
     "axes.spines.right": False,
 })
 THOUSANDS = FuncFormatter(lambda value, _: f"{value:,.0f}")
-PLAIN = FuncFormatter(lambda value, _: f"{value:g}")
+SECONDS = FuncFormatter(
+    lambda value, _: f"{value:.6f}".rstrip("0").rstrip("."))
 
 
 def make_plots(source_dir=None):
@@ -98,8 +99,8 @@ def _captions():
     large = [size for size in sizes if size >= LARGE_N_MIN]
     return {
         "dataset_summary.csv":
-            f"Dataset profile of housing.csv ({config.FULL_SIZE:,} rows), "
-            "before any sampling",
+            f"Dataset profile of housing.csv ({config.FULL_SIZE:,} rows, "
+            f"{_column_count()} columns), before any sampling",
         "scaling.csv":
             f"Scaling experiment (4.2): {column}, one random sample per "
             f"size (seed {seed}), n = {sizes[0]:,} to {sizes[-1]:,}; "
@@ -131,6 +132,12 @@ def _captions():
     }
 
 
+def _column_count():
+    """Number of columns in housing.csv, read from its header row."""
+    with open(config.DATA_PATH, newline="", encoding="utf-8") as file:
+        return len(next(csv.reader(file)))
+
+
 def _write_captions():
     """Save every title to results/tables/captions.md."""
     lines = ["# Titles for the results files", ""]
@@ -150,14 +157,15 @@ def _scaling_charts(rows, full_size, pdf):
     large = [row for row in rows if row["n"] >= LARGE_N_MIN]
 
     fig, ax = _line_chart(large, "median_runtime_s", log=False)
-    ax.yaxis.set_major_formatter(PLAIN)
+    ax.yaxis.set_major_formatter(SECONDS)
+    plt.setp(ax.get_xticklabels(), rotation=45)  # 250 and 500 sit close
     _finish(fig, ax, "Median runtime vs input size", subtitle,
             "Median runtime (seconds)")
     _save(fig, "runtime_vs_n.png", pdf)
 
     # All sizes on log-log axes, so the crossover is visible (Q5).
     fig, ax = _line_chart(rows, "median_runtime_s", log=True)
-    ax.yaxis.set_major_formatter(PLAIN)
+    ax.yaxis.set_major_formatter(SECONDS)
     for row in full_size:
         ax.scatter(config.FULL_SIZE, row["runtime_s"], marker="*", s=120,
                    color=STYLES["merge"]["color"], zorder=4,
@@ -208,7 +216,7 @@ def _input_order_charts(rows, pdf):
     ):
         fig, ax = _bar_chart(rows, "order", ORDERS, labels, measure)
         ax.yaxis.set_major_formatter(
-            THOUSANDS if measure == "comparisons" else PLAIN)
+            THOUSANDS if measure == "comparisons" else SECONDS)
         title = ("Comparisons by input order" if measure == "comparisons"
                  else "Median runtime by input order")
         _finish(fig, ax, title, subtitle, ylabel, xlabel="Input order",
@@ -242,7 +250,7 @@ def _repeated_values_chart(rows, pdf):
                 f"median of {config.REPEATS} runs")
     fig, ax = _bar_chart(rows, "column", columns, labels,
                          "median_runtime_s")
-    ax.yaxis.set_major_formatter(PLAIN)
+    ax.yaxis.set_major_formatter(SECONDS)
     _finish(fig, ax, "Median runtime by column", subtitle,
             "Median runtime (seconds, log scale)", xlabel="Column",
             bars=True)
@@ -275,13 +283,19 @@ def _repeated_values_table(rows):
 # ---------- growth factors (Section 4.2, from H4) ----------
 
 def _growth_factors_table(rows):
-    """Doublings down the side; measured ratios and theory across."""
+    """Doublings down the side; runtime and comparisons ratios per sort,
+    then the theory (Q3, Q15)."""
+    columns = [f"{name}_{ratio}" for name in ALGORITHMS
+               for ratio in ("runtime", "comparisons")]
+    columns += ["theory_n_squared", "theory_n_log_n"]
     table = {}
     for row in rows:
         key = f"{row['n_from']} to {row['n_to']}"
-        entry = table.setdefault(key, {name: "" for name in ALGORITHMS})
-        entry[row["algorithm"]] = f"{row['runtime_ratio']:.2f}"
-        theory = ("theory_n_log_n" if row["algorithm"] == "merge"
+        entry = table.setdefault(key, {column: "" for column in columns})
+        name = row["algorithm"]
+        entry[f"{name}_runtime"] = f"{row['runtime_ratio']:.2f}"
+        entry[f"{name}_comparisons"] = f"{row['comparisons_ratio']:.2f}"
+        theory = ("theory_n_log_n" if name == "merge"
                   else "theory_n_squared")
         entry[theory] = f"{row['theory_ratio']:.2f}"
     _save_rows(table, "growth_factors_table.csv", "doubling")
