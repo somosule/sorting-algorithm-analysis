@@ -94,3 +94,11 @@ def write_results(rows, filename, columns):
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()
         writer.writerows(rows)
+
+def verify_sorted(out, original, name):
+    """Raise an error if the sorting output is incorrect."""
+
+    expected = sorted(original)
+
+    if out != expected:
+        raise AssertionError(f"{name} produced an incorrect sorting result.")

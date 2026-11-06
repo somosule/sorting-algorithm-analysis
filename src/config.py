@@ -80,5 +80,10 @@ FULL_SIZE_COLUMNS = (
     "runs"
 )
 
+MEMORY_COLUMNS = (
+    "algorithm",
+    "peak_kib"
+)
+
 # Optional extension: look up original records after sorting (not part of the timed experiments).
 RUN_RECORD_LOOKUP = False
