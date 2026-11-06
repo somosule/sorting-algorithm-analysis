@@ -101,4 +101,4 @@ def verify_sorted(out, original, name):
     expected = sorted(original)
 
     if out != expected:
-      raise AssertionError(f"{name} produced an incorrect sorting result.")
+        raise AssertionError(f"{name} produced an incorrect sorting result.")

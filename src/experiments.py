@@ -207,6 +207,8 @@ def run_memory():
         finally:
             tracemalloc.stop()
 
+        verify_sorted(result, data, algorithm_name) 
+
         rows.append({
             "algorithm": algorithm_name,
             "peak_kib": round(peak / 1024, 1)
