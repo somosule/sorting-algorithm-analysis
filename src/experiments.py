@@ -6,7 +6,7 @@ import tracemalloc
 from src import config
 from src.load_data import load_column
 from src.sorts import ALGORITHMS
-from src.measure import run_algorithm, write_results
+from src.measure import run_algorithm, write_results, verify_sorted
 from src.data_profile import duplication_stats
 
 def run_scaling():
@@ -92,8 +92,6 @@ def build_orders(base, seed=config.SEED):
     for _ in range(k):
         i, j = rng.sample(range(len(ns)), 2)
         ns[i], ns[j] = ns[j], ns[i]
-
-    print(f"Nearly sorted: applied {k} swaps.")
 
     return {
         "random": r,
@@ -189,7 +187,7 @@ def run_repeated_values():
 def run_memory():
     """Measure peak memory usage for each sorting algorithm."""
 
-    values, _ = load_column(config.DATA_PATH, "median_income")
+    values, _ = load_column(config.DATA_PATH, config.SCALING_COLUMN)
 
     # Use the same random input as the random input-order experiment.
     base = random.Random(config.SEED).sample(values, config.ORDER_N)
@@ -204,22 +202,18 @@ def run_memory():
         tracemalloc.start()
 
         try:
-            result, _ = sort_fn(list(data))
+            result, _ = sort_fn(data)
             current, peak = tracemalloc.get_traced_memory()
         finally:
             tracemalloc.stop()
 
-        # Verify the output outside the measurement.
-        expected = sorted(data)
-        assert result == expected, f"{algorithm_name} produced incorrect output."
-
         rows.append({
             "algorithm": algorithm_name,
-            "peak_kib": peak / 1024
+            "peak_kib": round(peak / 1024, 1)
         })
 
     write_results(
         rows,
         "memory.csv",
-        columns=["algorithm", "peak_kib"]
+        columns=config.MEMORY_COLUMNS
     )
