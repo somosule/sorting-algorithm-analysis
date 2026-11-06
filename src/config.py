@@ -87,3 +87,6 @@ MEMORY_COLUMNS = (
 
 # Optional extension: look up original records after sorting (not part of the timed experiments).
 RUN_RECORD_LOOKUP = False
+
+# What-if extension (D23): estimate the missing total_bedrooms values; separate from the main results.
+RUN_MISSING_VALUES = False
