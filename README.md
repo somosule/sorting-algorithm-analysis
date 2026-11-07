@@ -55,7 +55,7 @@ Each generated CSV has a header and only the columns listed below.
 | `results/input_order.csv` | `order`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s` |
 | `results/repeated_values.csv` | `column`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s`, `distinct_values`, `most_frequent_count`, `values_repeated`, `elements_in_repeats`, `equal_pairs` |
 | `results/growth_factors.csv` | `algorithm`, `n_from`, `n_to`, `runtime_ratio`, `comparisons_ratio`, `theory_ratio` |
-| `results/bubble_estimate.csv` | `n`, `runtime_s`, `scale_factor`, `estimate_s`; the final row averages the estimates |
+| `results/bubble_estimate.csv` | `algorithm`, `n`, `runtime_s`, `scale_factor`, `estimate_s`; bubble rows then selection rows, each ending with an average row |
 | `results/full_size.csv` | `algorithm`, `source`, `comparisons`, `writes`, `swaps`, `passes`, `runtime_s`, `runs` |
 | `results/memory.csv` | `algorithm`, `peak_kib` |
 | `results/run_info.csv` | `setting`, `value`; fixed settings and run environment |
@@ -70,6 +70,7 @@ Each generated CSV has a header and only the columns listed below.
 | `results/tables/small_n_table.csv` | `n`, `bubble_us`, `selection_us`, `merge_us` |
 | `results/tables/input_order_table.csv` | `order`, comparisons, writes, passes and runtime in ms for each algorithm |
 | `results/tables/repeated_values_table.csv` | `column`, duplication statistics, sort comparisons, swaps and runtimes |
+| `results/tables/full_size_table.csv` | `algorithm`, `estimate_s`, `actual_s`, `source`, `difference_pct`; Q4 estimates against the full-dataset runs |
 | `results/tables/growth_factors_table.csv` | `doubling`, measured runtimes and comparisons, and theoretical growth |
 | `results/tables/decision_guide_evidence.csv` | `situation`, `source`, `n`, `algorithm`, `comparisons`, `writes`, `passes`, `median_runtime_s`, `fastest` |
 
