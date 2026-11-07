@@ -28,12 +28,15 @@ From the repository root:
 
 ```bash
 python main.py                      # full reproducible run; asks no questions
+python main.py --interactive        # exploratory menu; does not write to results/
 python -m unittest discover -v      # tests
 ```
 
 The full run took **55.0 seconds** on **Windows 11**, with an **Intel64 Family 6 Model 198 Stepping 2** processor, using **Python 3.14.4**. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
 
 The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots—in that order. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The optional `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` extensions are disabled by default.
+
+Use `python main.py --interactive` for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
 ## Outputs
 

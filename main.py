@@ -1,4 +1,5 @@
 """Run the complete, reproducible project analysis with ``python main.py``."""
+import argparse
 import csv
 import platform
 import time
@@ -83,7 +84,20 @@ def _write_run_info():
     return path
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Run sorting analysis experiments.")
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="run menu-driven exploratory experiments without writing results",
+    )
+    args = parser.parse_args(argv)
+    if args.interactive:
+        from src.interactive import run_interactive
+
+        run_interactive()
+        return
+
     if not config.DATA_PATH.exists():
         print(f"housing.csv not found at {config.DATA_PATH}. See README: Data.")
         return

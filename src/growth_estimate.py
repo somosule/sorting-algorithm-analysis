@@ -48,15 +48,21 @@ def growth_factors(rows):
     return results
 
 
-def bubble_estimate(rows, target_n):
-    """Estimate bubble sort's runtime for target_n values.
+def bubble_estimate(rows, target_n, algorithm="bubble"):
+    """Estimate a quadratic sort's runtime for target_n values.
 
     From each of the three largest measured sizes:
     estimate = runtime x (target_n / n) ** 2, assuming quadratic growth.
     The last row (n = "average") holds the mean of the three estimates.
     """
-    bubble = [row for row in rows if row["algorithm"] == "bubble"]
-    largest = bubble[-ESTIMATE_POINTS:]  # scaling.csv lists sizes in order
+    if algorithm not in ("bubble", "selection"):
+        raise ValueError("algorithm must be 'bubble' or 'selection'")
+    measured = [row for row in rows if row["algorithm"] == algorithm]
+    largest = measured[-ESTIMATE_POINTS:]  # scaling rows list sizes in order
+    if len(largest) < ESTIMATE_POINTS:
+        raise ValueError(
+            f"at least {ESTIMATE_POINTS} {algorithm} scaling rows are required"
+        )
     results = []
     for row in largest:
         scale = (target_n / row["n"]) ** 2
