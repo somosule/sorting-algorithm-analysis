@@ -29,6 +29,9 @@ SMALL_LOOP = 1000   # calls per timed loop for very small inputs
 # Bubble sort estimate target (4.2 step 4).
 FULL_SIZE = 20640
 
+# Optional full-size check, enabled only after the estimate is saved.
+RUN_BUBBLE_FULL = False
+
 # Algorithm names used in every results file.
 ALGORITHM_NAMES = ("bubble", "selection", "merge")
 

@@ -40,7 +40,7 @@ python -m unittest discover -v      # tests
 
 The full run took **55.0 seconds** on **Windows 11**, with an **Intel64 Family 6 Model 198 Stepping 2** processor, using **Python 3.14.4**. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
 
-The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The optional `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` extensions are disabled by default.
+The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. The full-size check normally measures merge sort; the optional bubble check runs once only when `RUN_BUBBLE_FULL` is enabled after the bubble estimate is saved. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The optional `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` extensions are disabled by default.
 
 Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
@@ -98,7 +98,7 @@ src/
   load_data.py       reads housing.csv with the csv module
   sorts.py           bubble, selection and merge sort with counters
   measure.py         timing and output verification
-  experiments.py     scaling, input-order and repeated-values experiments
+  experiments.py     experiments, with optional full-size bubble check
   data_profile.py    dataset inspection and duplication statistics
   growth_estimate.py growth factors and bubble sort estimate
   interactive.py     non-persistent exploratory menu

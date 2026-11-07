@@ -1,11 +1,12 @@
 
 """The three required experiments. Each writes one CSV to results/."""
 import random
+import time
 import tracemalloc
 
 from src import config
 from src.load_data import load_column
-from src.sorts import ALGORITHMS
+from src.sorts import ALGORITHMS, bubble_sort
 from src.measure import run_algorithm, write_results, verify_sorted
 from src.data_profile import duplication_stats
 
@@ -48,7 +49,7 @@ def run_scaling():
     )
 
 def run_full_size():
-    """Run merge sort on all 20,640 median_income values."""
+    """Run merge sort and, optionally, one bubble check on the full column."""
 
     values, _ = load_column(config.DATA_PATH, config.SCALING_COLUMN)
 
@@ -66,6 +67,27 @@ def run_full_size():
         "runtime_s": runtime,
         "runs": config.REPEATS
     }]
+
+    if config.RUN_BUBBLE_FULL:
+        original = list(data)
+        started = time.perf_counter()
+        result, stats = bubble_sort(data)
+        runtime = time.perf_counter() - started
+
+        verify_sorted(result, original, "bubble")
+        if data != original:
+            raise AssertionError("bubble modified the full-size input.")
+
+        rows.append({
+            "algorithm": "bubble",
+            "source": "check",
+            "comparisons": stats["comparisons"],
+            "writes": stats["writes"],
+            "swaps": stats["swaps"],
+            "passes": stats["passes"],
+            "runtime_s": runtime,
+            "runs": 1
+        })
 
     write_results(rows, "full_size.csv", config.FULL_SIZE_COLUMNS)
 
