@@ -245,6 +245,12 @@ def _ask_missing_version(column, raw_values, missing):
         "skip",
         "Please choose 1, 2, or 3.",
     )
+    version_labels = {
+        "skip": "raw data (blanks skipped)",
+        "ratio": "ratio-imputed data",
+        "median": "single median-filled data",
+    }
+    print(f"Selected total_bedrooms data version: {version_labels[method]}.")
     return bedrooms_column(config.DATA_PATH, method)[0]
 
 
@@ -406,8 +412,9 @@ def _run_one_exploration():
             column_rows = [row for row in rows if row["column"] == column]
             print(
                 f"Repeated values, {column}, n = {sizes[0]:,}, seed {seed} "
-                f"(exploration; the report uses "
-                f"{config.SCALING_COLUMN}, seed {config.SEED})"
+                f"(exploration; the report uses the brief's three columns at "
+                f"n = {config.ORDER_N:,}, seed {config.SEED}: "
+                f"{', '.join(config.COLUMNS)})"
             )
             _print_result_table(column_rows)
 

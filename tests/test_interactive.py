@@ -13,8 +13,10 @@ from src.growth_estimate import bubble_estimate
 from src.interactive import (
     ALL_SCALING_SIZES,
     _ask_experiment,
+    _ask_missing_version,
     _ask_sizes,
     _calculate_rows,
+    _run_one_exploration,
     run_interactive,
 )
 from src.load_data import load_column
@@ -89,6 +91,49 @@ class TestInteractiveCalculations(unittest.TestCase):
 
         with patch("builtins.input", return_value=""):
             self.assertEqual(_ask_sizes("scaling"), (250, 500, 1000, 2000, 4000))
+
+    def test_missing_values_prompt_reports_selected_data_version(self):
+        labels = {
+            "1": "raw data (blanks skipped)",
+            "2": "ratio-imputed data",
+            "3": "single median-filled data",
+        }
+        with patch("src.missing_values.bedrooms_column", return_value=([1.0], 0)):
+            for choice, label in labels.items():
+                output = io.StringIO()
+                with patch("builtins.input", return_value=choice):
+                    with redirect_stdout(output):
+                        values = _ask_missing_version(
+                            "total_bedrooms", [1.0], 207
+                        )
+                self.assertEqual(values, [1.0])
+                self.assertIn(
+                    f"Selected total_bedrooms data version: {label}.",
+                    output.getvalue(),
+                )
+
+    def test_repeated_values_label_reports_brief_columns_and_official_settings(self):
+        output = io.StringIO()
+        columns = config.COLUMNS
+        rows = [{"column": column} for column in columns]
+        with (
+            patch("src.interactive._ask_experiment", return_value="repeated values"),
+            patch("src.interactive._ask_sizes", return_value=(config.ORDER_N,)),
+            patch("src.interactive._ask_seed", return_value=config.SEED),
+            patch("src.interactive._ask_repeated_columns", return_value=columns),
+            patch("src.interactive._load_selected_columns", return_value={}),
+            patch("src.interactive._calculate_rows", return_value=rows),
+            patch("src.interactive._print_result_table"),
+            redirect_stdout(output),
+        ):
+            _run_one_exploration()
+
+        self.assertIn(
+            "the report uses the brief's three columns at "
+            f"n = {config.ORDER_N:,}, seed {config.SEED}: "
+            f"{', '.join(columns)}",
+            output.getvalue(),
+        )
 
     def test_main_dispatches_interactive_without_running_official_pipeline(self):
         from main import main

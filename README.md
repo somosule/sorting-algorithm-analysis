@@ -20,13 +20,19 @@ https://raw.githubusercontent.com/ageron/handson-ml2/master/datasets/housing/hou
 
 Note the hyphen in `handson-ml2`; the link often loses it when copied from the PDF. Save the file as `housing.csv` in the repository root without opening and re-saving it in Excel.
 
-The experiments use three columns: `median_income` (scaling and input order), plus `housing_median_age` and `median_house_value` (repeated values). `total_bedrooms` contains blank values and is not used.
+The experiments use three columns: `median_income` (scaling and input order), plus `housing_median_age` and `median_house_value` (repeated values). `total_bedrooms` has 207 blank values. It is left out of the main experiments and used only in the optional missing-values extension (`RUN_MISSING_VALUES` in `config.py`).
 
 ## Run
 
 From the repository root:
 
 ```bash
+# macOS
+python3 main.py                     # full reproducible run; asks no questions
+python3 main.py --interactive       # exploratory menu; does not write to results/
+python3 -m unittest discover -v     # tests
+
+# Windows
 python main.py                      # full reproducible run; asks no questions
 python main.py --interactive        # exploratory menu; does not write to results/
 python -m unittest discover -v      # tests
@@ -34,9 +40,9 @@ python -m unittest discover -v      # tests
 
 The full run took **55.0 seconds** on **Windows 11**, with an **Intel64 Family 6 Model 198 Stepping 2** processor, using **Python 3.14.4**. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
 
-The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots—in that order. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The optional `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` extensions are disabled by default.
+The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The optional `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` extensions are disabled by default.
 
-Use `python main.py --interactive` for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
+Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
 ## Outputs
 
@@ -53,6 +59,10 @@ Each generated CSV has a header and only the columns listed below.
 | `results/full_size.csv` | `algorithm`, `source`, `comparisons`, `writes`, `swaps`, `passes`, `runtime_s`, `runs` |
 | `results/memory.csv` | `algorithm`, `peak_kib` |
 | `results/run_info.csv` | `setting`, `value`; fixed settings and run environment |
+| `results/top_records.csv` | `csv_line`, `median_income`, `population`, `households`, `ocean_proximity` (optional record-lookup extension) |
+| `results/total_bedrooms_filled.csv` | `row_number`, `ocean_proximity`, `households`, `ratio_used`, `estimate` (optional missing-values extension) |
+| `results/total_bedrooms_before_after.csv` | `version`, `values`, `missing`, `distinct`, `min`, `max`, `median`, `most_frequent_value`, `most_frequent_count`, `values_repeated` (optional missing-values extension) |
+| `results/total_bedrooms_method_check.csv` | `method`, `median_abs_pct_error`, `share_within_10pct` (optional missing-values extension) |
 | `results/plots/` | `all_charts.pdf` and PNG charts for scaling runtimes, comparisons and writes, input-order comparisons and runtimes, and repeated values |
 | `results/tables/captions.md` | Captions for the report's results files |
 | `results/tables/scaling_runtime_table.csv` | `n`, `bubble_ms`, `selection_ms`, `merge_ms` |
@@ -67,7 +77,7 @@ Each generated CSV has a header and only the columns listed below.
 
 - `comparisons`, `writes` and `swaps` follow the counting rules below. They are identical on every computer and every run.
 - `median_runtime_s` is the median of 5 timings in seconds. It varies between computers. For n of 20 or less it is the time per call from a loop of 1,000 calls (`loop_reps`).
-- `run_info.csv` holds the fixed settings used for the run: seed, runs per timing, small-n loop size, sample size, and scaling column. It also records the Python version, computer, date and time, and that `measure.py` checks counts for consistency across repeats (raising an error if they differ).
+- `run_info.csv` holds the fixed settings used for the run: seed, runs per timing, small-n loop size, sample size, scaling column and sizes, and repeated-values columns. It also records the Python version, computer, date and time, and that `measure.py` checks counts for consistency across repeats (raising an error if they differ).
 
 ## Method summary
 
@@ -91,11 +101,19 @@ src/
   experiments.py     scaling, input-order and repeated-values experiments
   data_profile.py    dataset inspection and duplication statistics
   growth_estimate.py growth factors and bubble sort estimate
+  interactive.py     non-persistent exploratory menu
   make_plots.py      tables and plots
+  missing_values.py  optional total_bedrooms missing-values extension
   record_lookup.py   optional: look up original records after sorting
 tests/
-  test_sorts.py      correctness tests
-  test_structure.py  checks banned libraries, sorted() use, settings, files
+  test_data_profile.py    dataset profile tests
+  test_interactive.py     exploratory menu tests
+  test_load_data.py       data-loading tests
+  test_missing_values.py  optional missing-values tests
+  test_record_lookup.py   optional record-lookup tests
+  test_run_info.py        run metadata tests
+  test_sorts.py           correctness tests
+  test_structure.py       checks banned libraries, sorted() use, settings, files
 results/             generated outputs (committed)
 docs/                checklist, decisions and notes for the report
 ```

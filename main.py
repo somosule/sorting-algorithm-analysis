@@ -66,6 +66,8 @@ def _write_run_info():
         ("small_n_loop_size", config.SMALL_LOOP),
         ("sample_size", config.ORDER_N),
         ("scaling_column", config.SCALING_COLUMN),
+        ("scaling_sizes", ", ".join(str(size) for size in config.SCALING_SIZES)),
+        ("repeated_values_columns", ", ".join(config.COLUMNS)),
         ("python_version", platform.python_version()),
         ("computer", computer),
         ("date_time", datetime.now().astimezone().isoformat(timespec="seconds")),
