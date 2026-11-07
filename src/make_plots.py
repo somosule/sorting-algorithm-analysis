@@ -67,6 +67,7 @@ def make_plots(source_dir=None):
     input_order = _read_csv(source, "input_order.csv")
     repeated = _read_csv(source, "repeated_values.csv")
     growth = _read_csv(source, "growth_factors.csv")
+    estimates = _read_csv(source, "bubble_estimate.csv")
 
     pdf_path = config.PLOTS_DIR / "all_charts.pdf"
     with PdfPages(pdf_path) as pdf:
@@ -83,6 +84,8 @@ def make_plots(source_dir=None):
         _growth_factors_table(growth)
     if scaling and full_size and input_order and repeated:
         _decision_guide_evidence(scaling, full_size, input_order, repeated)
+    if estimates and full_size:
+        _full_size_table(estimates, full_size)
     _write_captions()
     print(f"Saved plots/{pdf_path.name}")
     return pdf_path
@@ -114,8 +117,13 @@ def _captions():
             f"Growth factors when n doubles ({large[0]:,} to "
             f"{large[-1]:,}), {column}, seed {seed}, compared with theory",
         "bubble_estimate.csv":
-            f"Bubble sort estimate for {config.FULL_SIZE:,} values, from "
-            f"measured runtimes at n = {estimate_sizes}",
+            f"Bubble and selection sort estimates for {config.FULL_SIZE:,} "
+            f"values, from measured runtimes at n = {estimate_sizes}",
+        "full_size_table.csv":
+            f"Full dataset (Q4): all {config.FULL_SIZE:,} {column} values, "
+            f"seed {seed}; estimates from n = {sizes[-3]:,} to "
+            f"{sizes[-1]:,}; merge median of {runs} runs; "
+            "bubble check a single run",
         "input_order.csv":
             f"Input-order experiment (4.3): one {column} sample, "
             f"n = {n:,}, seed {seed}, in four versions; median of {runs} runs",
@@ -168,8 +176,9 @@ def _scaling_charts(rows, full_size, pdf):
     ax.yaxis.set_major_formatter(SECONDS)
     for row in full_size:
         ax.scatter(config.FULL_SIZE, row["runtime_s"], marker="*", s=120,
-                   color=STYLES["merge"]["color"], zorder=4,
-                   label=f"merge, all {config.FULL_SIZE:,} values")
+                   color=STYLES[row["algorithm"]]["color"], zorder=4,
+                   label=f"{row['algorithm']}, all {config.FULL_SIZE:,} "
+                         "values")
     if full_size:
         ticks = [*ax.get_xticks(), config.FULL_SIZE]
         ax.set_xticks(ticks)
@@ -191,8 +200,9 @@ def _scaling_tables(rows, full_size):
     """Runtimes in ms (all sizes), comparisons, and small n in µs."""
     table = _pivot(rows, "n", "median_runtime_s", MS)
     for row in full_size:
-        table[f"{config.FULL_SIZE} (full dataset)"] = {
-            row["algorithm"]: _sig3(row["runtime_s"] * MS)}
+        key = f"{config.FULL_SIZE} (full dataset)"
+        table.setdefault(key, {})[row["algorithm"]] = _sig3(
+            row["runtime_s"] * MS)
     _save_table(table, "scaling_runtime_table.csv", "n", "_ms")
     _save_table(_pivot(rows, "n", "comparisons"),
                 "scaling_comparisons_table.csv", "n")
@@ -301,6 +311,31 @@ def _growth_factors_table(rows):
     _save_rows(table, "growth_factors_table.csv", "doubling")
 
 
+# ---------- full dataset, Q4 ----------
+
+def _full_size_table(estimates, full_size):
+    """Estimates against the full-dataset runs (Q4), one row per sort."""
+    average = {row.get("algorithm"): row["estimate_s"]
+               for row in estimates if row["n"] == "average"}
+    actual = {row["algorithm"]: row["runtime_s"] for row in full_size}
+
+    table = {}
+    for name, source in (("bubble", "estimate + check"),
+                         ("selection", "estimate"), ("merge", "measured")):
+        estimate = average.get(name) if name != "merge" else None
+        measured = actual.get(name) if name != "selection" else None
+        difference = ""
+        if estimate and measured:
+            difference = f"{(measured - estimate) / estimate * 100:.1f}"
+        table[name] = {
+            "estimate_s": _sig3(estimate) if estimate else "",
+            "actual_s": _sig3(measured) if measured else "",
+            "source": source,
+            "difference_pct": difference,
+        }
+    _save_rows(table, "full_size_table.csv", "algorithm")
+
+
 # ---------- decision guide (D17) ----------
 
 def _decision_guide_evidence(scaling, full_size, input_order, repeated):
@@ -309,8 +344,9 @@ def _decision_guide_evidence(scaling, full_size, input_order, repeated):
     for n in (config.SCALING_SIZES[-1],):
         groups.append(("Large random input", "scaling.csv", n,
                        _pick(scaling, n=n)))
+    # Merge only: the bubble check is evidence for Q4, not the guide.
     groups.append(("Large random input", "full_size.csv", config.FULL_SIZE,
-                   full_size))
+                   _pick(full_size, algorithm="merge")))
     for n in (size for size in config.SCALING_SIZES
               if size <= config.SMALL_N_MAX):
         groups.append(("Very small list (n < 20)", "scaling.csv", n,

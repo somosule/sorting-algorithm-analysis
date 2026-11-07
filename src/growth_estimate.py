@@ -17,7 +17,9 @@ GROWTH_COLUMNS = (
     "algorithm", "n_from", "n_to",
     "runtime_ratio", "comparisons_ratio", "theory_ratio",
 )
-ESTIMATE_COLUMNS = ("n", "runtime_s", "scale_factor", "estimate_s")
+ESTIMATE_COLUMNS = (
+    "algorithm", "n", "runtime_s", "scale_factor", "estimate_s",
+)
 
 
 def growth_factors(rows):
@@ -67,14 +69,15 @@ def bubble_estimate(rows, target_n, algorithm="bubble"):
     for row in largest:
         scale = (target_n / row["n"]) ** 2
         results.append({
+            "algorithm": algorithm,
             "n": row["n"],
             "runtime_s": row["median_runtime_s"],
             "scale_factor": scale,
             "estimate_s": row["median_runtime_s"] * scale,
         })
     average = sum(r["estimate_s"] for r in results) / len(results)
-    results.append({"n": "average", "runtime_s": "", "scale_factor": "",
-                    "estimate_s": average})
+    results.append({"algorithm": algorithm, "n": "average", "runtime_s": "",
+                    "scale_factor": "", "estimate_s": average})
     return results
 
 
@@ -86,8 +89,14 @@ def write_growth_factors():
 
 
 def write_bubble_estimate():
-    """Write results/bubble_estimate.csv for all config.FULL_SIZE values."""
-    rows = bubble_estimate(_read_scaling(), config.FULL_SIZE)
+    """Write results/bubble_estimate.csv for all config.FULL_SIZE values.
+
+    Bubble sort's rows first, then selection sort's, each ending with
+    its average row.
+    """
+    scaling = _read_scaling()
+    rows = [row for algorithm in ("bubble", "selection")
+            for row in bubble_estimate(scaling, config.FULL_SIZE, algorithm)]
     write_results(rows, "bubble_estimate.csv", ESTIMATE_COLUMNS)
     return rows
 
