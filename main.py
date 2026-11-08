@@ -46,7 +46,7 @@ def _report_step(label, action, output_paths):
     elapsed = time.perf_counter() - started
 
     paths = [config.ROOT / path for path in output_paths]
-    if len(paths) == 1 and paths[0].is_file():
+    if len(paths) == 1 and paths[0].suffix == ".csv" and paths[0].is_file():
         count = _csv_row_count(paths[0])
         output = f"{count:,} rows -> {_relative_path(paths[0])}"
     else:
@@ -57,7 +57,7 @@ def _report_step(label, action, output_paths):
             if file.is_file()
         ]
         output = (
-            f"{len(existing_files):,} files -> "
+            f"{len(existing_files):,} file{'' if len(existing_files) == 1 else 's'} -> "
             + ", ".join(_relative_path(path) for path in paths)
         )
     print(f"{label}: {output} ({elapsed:.1f} s)")
@@ -220,6 +220,14 @@ def main(argv=None):
         )
 
     _report_step("Run info", _write_run_info, ["results/run_info.csv"])
+
+    # Last: collate every table and chart into one workbook (needs openpyxl).
+    try:
+        from src.make_workbook import make_workbook
+    except ImportError:
+        print("openpyxl not installed: workbook skipped (pip install openpyxl).")
+    else:
+        _report_step("Workbook", make_workbook, ["results/results_workbook.xlsx"])
     print(f"Charts: {_relative_path(config.PLOTS_DIR / 'all_charts.pdf')}")
     print(f"Captions: {_relative_path(config.TABLES_DIR / 'captions.md')}")
     print(f"Done in {time.perf_counter() - started:.1f} s")
