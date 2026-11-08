@@ -10,6 +10,7 @@ We implement bubble sort, selection sort and merge sort from scratch in Python, 
 
 - Python 3.10 or newer, standard library only for loading data and the algorithms.
 - matplotlib (optional) for plots: `pip install matplotlib`. Without it, every results CSV is still produced and plots are skipped.
+- openpyxl (optional) for the results workbook: `pip install openpyxl`. Without it, the workbook is skipped with a message.
 
 ## Data
 
@@ -32,6 +33,7 @@ python3 main.py                     # full reproducible run; asks no questions
 python3 main.py --all-extras        # the official run: also the three optional steps
 python3 main.py --interactive       # exploratory menu; does not write to results/
 python3 main.py --help              # lists every option
+python3 -m src.make_workbook        # rebuild only the workbook from the current results
 python3 -m unittest discover -v     # tests
 
 # Windows
@@ -39,6 +41,7 @@ python main.py                      # full reproducible run; asks no questions
 python main.py --all-extras         # the official run: also the three optional steps
 python main.py --interactive        # exploratory menu; does not write to results/
 python main.py --help               # lists every option
+python -m src.make_workbook         # rebuild only the workbook from the current results
 python -m unittest discover -v      # tests
 ```
 
@@ -53,7 +56,7 @@ The command runs the dataset profile, scaling, input-order and repeated-values e
 | `--record-lookup` | Runs the record lookup extension |
 | `--all-extras` | All three; this is the official run used for the report |
 
-Options can be combined, for example `python3 main.py --bubble-check --record-lookup`. The defaults are the switches `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` in `src/config.py`. The run prints which optional steps are on and records them in `results/run_info.csv` (`extras_run`).
+Options can be combined, for example `python3 main.py --bubble-check --record-lookup`. A run does not delete files written by an earlier run, so to start clean (as for the official run), clear the results first: `find results -type f ! -name ".gitkeep" -delete`. The defaults are the switches `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` in `src/config.py`. The run prints which optional steps are on and records them in `results/run_info.csv` (`extras_run`).
 
 Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
@@ -135,6 +138,7 @@ Every file is written by `main.py`, grouped below by the section of the brief it
 | `results/run_info.csv` | `setting`, `value`: seed, runs per timing, sizes, columns, optional steps run, Python version, computer, date and time |
 | `results/tables/captions.md` | The title of every results file, built from `src/config.py` |
 | `results/plots/all_charts.pdf` | Every chart, one per page |
+| `results/results_workbook.xlsx` | Every table and chart above collated in one formatted workbook, built as the last step of every run: a contents sheet; a Questions sheet listing every question in the brief with the key numbers from the run and a link to its evidence; one sheet per section of the brief, with the 4.3 and 4.4 results split into small tables labelled with the questions they answer; then the raw results. Extension tables appear only if their optional step ran in that run (needs openpyxl) |
 
 ### How to read the results
 
@@ -166,12 +170,14 @@ src/
   growth_estimate.py growth factors and bubble sort estimate
   interactive.py     non-persistent exploratory menu
   make_plots.py      tables and plots
+  make_workbook.py   collates every table and chart into results/results_workbook.xlsx
   missing_values.py  optional total_bedrooms missing-values extension
   record_lookup.py   optional: look up original records after sorting
 tests/
   test_data_profile.py    dataset profile tests
   test_interactive.py     exploratory menu tests
   test_load_data.py       data-loading tests
+  test_make_workbook.py   results workbook tests
   test_main_options.py    command-line option tests
   test_missing_values.py  optional missing-values tests
   test_record_lookup.py   optional record-lookup tests

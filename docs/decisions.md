@@ -43,6 +43,7 @@ Format:
 | D26 | One approval to merge a pull request | Agreed (Thu 5 Nov) |
 | D27 | Interactive mode: python3 main.py --interactive | Agreed (Thu 5 Nov), requested by Dr Khan |
 | D28 | Command-line options for the optional steps (--all-extras for the official run) | Agreed (Sat 7 Nov) |
+| D29 | Results workbook collating every table and chart | Agreed (Sun 8 Nov) |
 
 ## D01: housing.csv committed in the repository root
 **Decision:** `housing.csv` sits next to `main.py` and is committed.
@@ -197,4 +198,9 @@ All three sorts always run, and the table shows comparisons, writes, swaps, pass
 **Decision:** `python3 main.py` switches on the optional steps with command-line options instead of edits to config.py: `--bubble-check` (D15), `--missing-values` (D05), `--record-lookup` (D08), and `--all-extras` for all three, which is the official run (D11). The switches in config.py (`RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES`, `RUN_RECORD_LOOKUP`) stay off and act as the defaults; an option turns its step on for that run only, so config.py never changes. The run prints which optional steps are on, `results/run_info.csv` records them (`extras_run`), and `python3 main.py --help` lists every option. The run still asks no questions (D25); exploring stays in `--interactive` (D27).
 **Why:** Editing config.py to switch a step on was not user-friendly and was easy to forget to undo before committing. Options are the standard approach: defaults in one settings file, choices typed with the command, so the exact command can be quoted and repeated. The other steps and the results are identical with or without the options (D23).
 **Report:** Section 2: "The official results were produced with `python3 main.py --all-extras`; `results/run_info.csv` records the settings, machine and optional steps."
+
+## D29: Results workbook collating every table and chart
+**Decision:** As its last step, `python3 main.py` builds `results/results_workbook.xlsx` with `src/make_workbook.py`: a contents sheet with the run details; a Questions sheet listing every question in the brief (4.2 steps 1 to 5, Q6 to Q17 and the decision guide) with the key numbers from this run, calculated from the results files, and a link to the sheet holding the evidence; then one sheet per section of the brief, each with titled tables, readable headings and the matching charts beside them, the 4.3 and 4.4 results split into small tables labelled with the questions they answer (built from input_order.csv and repeated_values.csv; the wide tables stay at the bottom); then the raw results. Extension tables appear only if their optional step ran in that run (from run_info.csv), so leftovers from an earlier run never show. `python3 -m src.make_workbook` rebuilds the workbook alone from the current results without rerunning anything. It only reads the finished results files, so it never changes a result. openpyxl is optional, like matplotlib: without it the workbook is skipped with a message.
+**Why:** The CSVs are plain text by design (D10, D24), so they cannot carry titles or formatting, and there are over 20 results files. One workbook organised by section of the brief makes the results easy to find, read and copy into the report and slides, and it is rebuilt by code on every run, so it always matches the results.
+**Report:** Section 2: "All tables and charts are also collated in results/results_workbook.xlsx." The explanations for each question are written in the report; the workbook gives the evidence.
 
