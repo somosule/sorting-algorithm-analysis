@@ -30,6 +30,7 @@ SMALL_LOOP = 1000   # calls per timed loop for very small inputs
 FULL_SIZE = 20640
 
 # Optional full-size check, enabled only after the estimate is saved.
+# Default off; switch on for one run with: python3 main.py --bubble-check (or --all-extras).
 RUN_BUBBLE_FULL = False
 
 # Algorithm names used in every results file.
@@ -89,7 +90,9 @@ MEMORY_COLUMNS = (
 )
 
 # Optional extension: look up original records after sorting (not part of the timed experiments).
+# Default off; switch on for one run with: python3 main.py --record-lookup (or --all-extras).
 RUN_RECORD_LOOKUP = False
 
 # What-if extension (D23): estimate the missing total_bedrooms values; separate from the main results.
+# Default off; switch on for one run with: python3 main.py --missing-values (or --all-extras).
 RUN_MISSING_VALUES = False

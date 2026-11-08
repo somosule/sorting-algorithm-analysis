@@ -1,4 +1,8 @@
-"""Run the complete, reproducible project analysis with ``python main.py``."""
+"""Run the complete, reproducible project analysis with ``python main.py``.
+
+Optional steps are switched on with command-line options, for example
+``python main.py --all-extras`` for the official run; see ``--help``.
+"""
 import argparse
 import csv
 import platform
@@ -15,6 +19,13 @@ from src.experiments import (
     run_scaling,
 )
 from src.growth_estimate import write_bubble_estimate, write_growth_factors
+
+# Optional steps: command-line option and the config.py switch it turns on.
+EXTRAS = (
+    ("bubble-check", "RUN_BUBBLE_FULL"),
+    ("missing-values", "RUN_MISSING_VALUES"),
+    ("record-lookup", "RUN_RECORD_LOOKUP"),
+)
 
 
 def _relative_path(path):
@@ -53,6 +64,23 @@ def _report_step(label, action, output_paths):
     return result
 
 
+def _extras_run():
+    """Names of the optional steps switched on for this run."""
+    names = [option for option, switch in EXTRAS if getattr(config, switch)]
+    return ", ".join(names) if names else "none"
+
+
+def _apply_options(args):
+    """Switch on the optional steps chosen on the command line.
+
+    The switches in config.py stay the defaults; an option turns its step on
+    for this run only, so nobody needs to edit config.py.
+    """
+    for option, switch in EXTRAS:
+        if args.all_extras or getattr(args, option.replace("-", "_")):
+            setattr(config, switch, True)
+
+
 def _write_run_info():
     """Write the fixed settings and execution environment for this run."""
     processor = platform.processor()
@@ -68,6 +96,7 @@ def _write_run_info():
         ("scaling_column", config.SCALING_COLUMN),
         ("scaling_sizes", ", ".join(str(size) for size in config.SCALING_SIZES)),
         ("repeated_values_columns", ", ".join(config.COLUMNS)),
+        ("extras_run", _extras_run()),
         ("python_version", platform.python_version()),
         ("computer", computer),
         ("date_time", datetime.now().astimezone().isoformat(timespec="seconds")),
@@ -86,14 +115,39 @@ def _write_run_info():
     return path
 
 
-def main(argv=None):
+def _parse_args(argv):
+    """Read the command-line options."""
     parser = argparse.ArgumentParser(description="Run sorting analysis experiments.")
     parser.add_argument(
         "--interactive",
         action="store_true",
         help="run menu-driven exploratory experiments without writing results",
     )
-    args = parser.parse_args(argv)
+    parser.add_argument(
+        "--bubble-check",
+        action="store_true",
+        help="also run bubble sort once on all values to check its estimate",
+    )
+    parser.add_argument(
+        "--missing-values",
+        action="store_true",
+        help="also run the total_bedrooms missing-values extension",
+    )
+    parser.add_argument(
+        "--record-lookup",
+        action="store_true",
+        help="also run the record lookup extension",
+    )
+    parser.add_argument(
+        "--all-extras",
+        action="store_true",
+        help="run all three optional steps (the official run)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = _parse_args(argv)
     if args.interactive:
         from src.interactive import run_interactive
 
@@ -104,6 +158,8 @@ def main(argv=None):
         print(f"housing.csv not found at {config.DATA_PATH}. See README: Data.")
         return
 
+    _apply_options(args)
+    print(f"Optional steps: {_extras_run()}")
     started = time.perf_counter()
     _report_step(
         "Dataset profile",
