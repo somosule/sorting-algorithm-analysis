@@ -1,0 +1,29 @@
+situation,source,n,algorithm,comparisons,writes,passes,median_runtime_s,fastest
+Large random input,scaling.csv,4000,bubble,7997010,8006726,3955,0.8465615000004618,
+Large random input,scaling.csv,4000,selection,7998000,7964,3999,0.35175920800065796,
+Large random input,scaling.csv,4000,merge,42817,47904,0,0.006277458000113256,yes
+Large random input,full_size.csv,20640,merge,269952,297472,0,0.038698584000485425,
+Very small list (n < 20),scaling.csv,5,bubble,10,10,4,1.4176249997035485e-06,
+Very small list (n < 20),scaling.csv,5,selection,10,6,4,1.1750829999073176e-06,yes
+Very small list (n < 20),scaling.csv,5,merge,7,12,0,2.1039590001237227e-06,
+Very small list (n < 20),scaling.csv,10,bubble,35,40,5,4.137750000154483e-06,
+Very small list (n < 20),scaling.csv,10,selection,45,16,9,3.5330410000824485e-06,yes
+Very small list (n < 20),scaling.csv,10,merge,22,34,0,5.340415999853576e-06,
+Very small list (n < 20),scaling.csv,20,bubble,175,164,14,1.7505875000097147e-05,
+Very small list (n < 20),scaling.csv,20,selection,190,32,19,1.0792750000291562e-05,yes
+Very small list (n < 20),scaling.csv,20,merge,60,88,0,1.2725707999379665e-05,
+Already sorted input,input_order.csv,2000,bubble,1999,0,1,0.00010287500026606722,yes
+Already sorted input,input_order.csv,2000,selection,1999000,0,1999,0.0875519589999385,
+Already sorted input,input_order.csv,2000,merge,10864,21952,0,0.002315124999768159,
+Nearly sorted input,input_order.csv,2000,bubble,1894347,49366,1542,0.09798383300039859,
+Nearly sorted input,input_order.csv,2000,selection,1999000,44,1999,0.08739758299998357,
+Nearly sorted input,input_order.csv,2000,merge,14370,21952,0,0.002491625000402564,yes
+Reverse-sorted input,input_order.csv,2000,bubble,1999000,3997314,1999,0.2903687500001979,
+Reverse-sorted input,input_order.csv,2000,selection,1999000,2198,1999,0.0923573749996649,
+Reverse-sorted input,input_order.csv,2000,merge,11202,21952,0,0.0023247910003192374,yes
+Many repeated values,repeated_values.csv: housing_median_age,2000,bubble,1997347,1982884,1942,0.20799499999975524,
+Many repeated values,repeated_values.csv: housing_median_age,2000,selection,1999000,3778,1999,0.08729304100052104,
+Many repeated values,repeated_values.csv: housing_median_age,2000,merge,19186,21952,0,0.003108250000877888,yes
+Many repeated values,repeated_values.csv: median_income,2000,bubble,1998220,1983256,1960,0.2076498749993334,
+Many repeated values,repeated_values.csv: median_income,2000,selection,1999000,3972,1999,0.08767154199995275,
+Many repeated values,repeated_values.csv: median_income,2000,merge,19371,21952,0,0.002883709000343515,yes

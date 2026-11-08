@@ -1,0 +1,13 @@
+setting,value
+seed,42
+runs_per_timing,5
+small_n_loop_size,1000
+sample_size,2000
+scaling_column,median_income
+scaling_sizes,"5, 10, 20, 50, 100, 250, 500, 1000, 2000, 4000"
+repeated_values_columns,"median_income, housing_median_age, median_house_value"
+extras_run,"bubble-check, missing-values, record-lookup"
+python_version,3.14.7
+computer,macOS-26.3.1-arm64-arm-64bit-Mach-O; processor: arm
+date_time,2026-11-08T14:56:22-05:00
+counts_identical_across_repeats,checked by measure.py; every run raises an error if counts differ

@@ -45,7 +45,7 @@ python -m src.make_workbook         # rebuild only the workbook from the current
 python -m unittest discover -v      # tests
 ```
 
-The full run took **55.0 seconds** on **Windows 11**, with an **Intel64 Family 6 Model 198 Stepping 2** processor, using **Python 3.14.4**. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
+The official run (`python3 main.py --all-extras`) took **43.8 seconds** on a **MacBook Air (Apple silicon, macOS 26.3.1)** using **Python 3.14.7**; about 23 seconds of that is the optional bubble check, so a plain `python3 main.py` takes about 20 seconds. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
 
 The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. The full-size check normally measures merge sort; the optional bubble check runs once only when `RUN_BUBBLE_FULL` is enabled after the bubble estimate is saved. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The three optional steps are off by default. Switch them on with command-line options, with no need to edit any code:
 

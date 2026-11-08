@@ -1,0 +1,4 @@
+column,distinct_values,most_frequent_count,values_repeated,elements_in_repeats,equal_pairs,bubble_comparisons,bubble_ms,bubble_swaps,expected_bubble_swaps,order_effect,selection_comparisons,selection_ms,merge_comparisons,merge_ms
+median_income,1785,8,147,362,343,1998220,208,991628,999328,-7700,1999000,87.7,19371,2.88
+housing_median_age,51,106,51,2000,49886,1997347,208,991442,974557,16885,1999000,87.3,19186,3.11
+median_house_value,1322,91,369,1047,5266,1998700,206,981103,996867,-15764,1999000,88.3,19250,2.91
