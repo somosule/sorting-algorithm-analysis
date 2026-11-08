@@ -119,7 +119,7 @@ def _captions():
         "bubble_estimate.csv":
             f"Bubble and selection sort estimates for {config.FULL_SIZE:,} "
             f"values, from measured runtimes at n = {estimate_sizes}",
-        "full_size_table.csv":
+        "scaling_full_size_table.csv":
             f"Full dataset (Q4): all {config.FULL_SIZE:,} {column} values, "
             f"seed {seed}; estimates from n = {sizes[-3]:,} to "
             f"{sizes[-1]:,}; merge median of {runs} runs; "
@@ -169,7 +169,7 @@ def _scaling_charts(rows, full_size, pdf):
     plt.setp(ax.get_xticklabels(), rotation=45)  # 250 and 500 sit close
     _finish(fig, ax, "Median runtime vs input size", subtitle,
             "Median runtime (seconds)")
-    _save(fig, "runtime_vs_n.png", pdf)
+    _save(fig, "scaling_runtime.png", pdf)
 
     # All sizes on log-log axes, so the crossover is visible (Q5).
     fig, ax = _line_chart(rows, "median_runtime_s", log=True)
@@ -186,14 +186,14 @@ def _scaling_charts(rows, full_size, pdf):
                            rotation=45)
     _finish(fig, ax, "Median runtime vs input size (log-log)", subtitle,
             "Median runtime (seconds, log scale)")
-    _save(fig, "runtime_vs_n_loglog.png", pdf)
+    _save(fig, "scaling_runtime_loglog.png", pdf)
 
     for measure in ("comparisons", "writes"):
         fig, ax = _line_chart(large, measure, log=True)
         ax.yaxis.set_major_formatter(THOUSANDS)
         _finish(fig, ax, f"{measure.capitalize()} vs input size", subtitle,
                 f"{measure.capitalize()} (count, log scale)")
-        _save(fig, f"{measure}_vs_n.png", pdf)
+        _save(fig, f"scaling_{measure}.png", pdf)
 
 
 def _scaling_tables(rows, full_size):
@@ -208,7 +208,7 @@ def _scaling_tables(rows, full_size):
                 "scaling_comparisons_table.csv", "n")
     small = [row for row in rows if row["n"] <= config.SMALL_N_MAX]
     _save_table(_pivot(small, "n", "median_runtime_s", US),
-                "small_n_table.csv", "n", "_us")
+                "scaling_small_n_table.csv", "n", "_us")
 
 
 # ---------- input order (Section 4.3) ----------
@@ -308,7 +308,7 @@ def _growth_factors_table(rows):
         theory = ("theory_n_log_n" if name == "merge"
                   else "theory_n_squared")
         entry[theory] = f"{row['theory_ratio']:.2f}"
-    _save_rows(table, "growth_factors_table.csv", "doubling")
+    _save_rows(table, "scaling_growth_factors_table.csv", "doubling")
 
 
 # ---------- full dataset, Q4 ----------
@@ -333,7 +333,7 @@ def _full_size_table(estimates, full_size):
             "source": source,
             "difference_pct": difference,
         }
-    _save_rows(table, "full_size_table.csv", "algorithm")
+    _save_rows(table, "scaling_full_size_table.csv", "algorithm")
 
 
 # ---------- decision guide (D17) ----------
