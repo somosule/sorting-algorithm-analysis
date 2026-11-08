@@ -1,0 +1,3 @@
+algorithm,source,comparisons,writes,swaps,passes,runtime_s,runs
+merge,measured,269952,297472,0,0,0.038698584000485425,5
+bubble,check,212971260,213885534,106942767,20424,22.880629332999888,1

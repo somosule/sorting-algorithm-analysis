@@ -1,0 +1,4 @@
+method,median_abs_pct_error,share_within_10pct
+single median fill,37.7,14.0
+ratio to total_rooms,15.4,33.7
+ratio to households,4.4,81.8

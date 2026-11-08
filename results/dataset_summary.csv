@@ -1,0 +1,5 @@
+column,rows,missing,distinct,min,max,cap_count
+median_income,20640,0,12928,0.4999,15.0001,
+housing_median_age,20640,0,52,1.0,52.0,
+median_house_value,20640,0,3842,14999.0,500001.0,965
+total_bedrooms,20640,207,1923,1.0,6445.0,

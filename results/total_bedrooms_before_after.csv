@@ -1,0 +1,4 @@
+version,values,missing,distinct,min,max,median,most_frequent_value,most_frequent_count,values_repeated
+before (blanks skipped),20433,207,1923,1.0,6445.0,435.0,280.0,55,1450
+after: ratio estimate (households),20640,0,1928,1.0,6445.0,435.0,280.0,56,1454
+after: single median fill,20640,0,1923,1.0,6445.0,435.0,435.0,244,1450

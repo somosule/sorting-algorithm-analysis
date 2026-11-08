@@ -1,0 +1,5 @@
+order,bubble_comparisons,bubble_writes,bubble_passes,bubble_ms,selection_comparisons,selection_writes,selection_passes,selection_ms,merge_comparisons,merge_writes,merge_ms
+random,1998594,2024598,1971,210,1999000,3982,1999,87.9,19419,21952,2.88
+sorted,1999,0,1,0.103,1999000,0,1999,87.6,10864,21952,2.32
+reverse,1999000,3997314,1999,290,1999000,2198,1999,92.4,11202,21952,2.32
+nearly sorted,1894347,49366,1542,98.0,1999000,44,1999,87.4,14370,21952,2.49
