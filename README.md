@@ -59,33 +59,82 @@ Use `python3 main.py --interactive` on macOS or `python main.py --interactive` o
 
 ## Outputs
 
-Each generated CSV has a header and only the columns listed below.
+Every file is written by `main.py`, grouped below by the section of the brief it answers. Raw results sit in `results/`; report-ready tables (rounded, one column per sort) in `results/tables/`; charts in `results/plots/`, all of them also collected in `results/plots/all_charts.pdf`. `results/tables/captions.md` gives each results file its title. Each CSV has a header and only the columns listed.
+
+### Dataset profile (Section 3)
 
 | File | Columns / contents |
 |---|---|
 | `results/dataset_summary.csv` | `column`, `rows`, `missing`, `distinct`, `min`, `max`, `cap_count` |
+
+### 4.2 Scaling
+
+| File | Columns / contents |
+|---|---|
 | `results/scaling.csv` | `n`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s`, `loop_reps` |
-| `results/input_order.csv` | `order`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s` |
-| `results/repeated_values.csv` | `column`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s`, `distinct_values`, `most_frequent_count`, `values_repeated`, `elements_in_repeats`, `equal_pairs` |
-| `results/growth_factors.csv` | `algorithm`, `n_from`, `n_to`, `runtime_ratio`, `comparisons_ratio`, `theory_ratio` |
-| `results/bubble_estimate.csv` | `algorithm`, `n`, `runtime_s`, `scale_factor`, `estimate_s`; bubble rows then selection rows, each ending with an average row |
-| `results/full_size.csv` | `algorithm`, `source`, `comparisons`, `writes`, `swaps`, `passes`, `runtime_s`, `runs` |
-| `results/memory.csv` | `algorithm`, `peak_kib` |
-| `results/run_info.csv` | `setting`, `value`; fixed settings and run environment |
-| `results/top_records.csv` | `csv_line`, `median_income`, `population`, `households`, `ocean_proximity` (optional record-lookup extension) |
-| `results/total_bedrooms_filled.csv` | `row_number`, `ocean_proximity`, `households`, `ratio_used`, `estimate` (optional missing-values extension) |
-| `results/total_bedrooms_before_after.csv` | `version`, `values`, `missing`, `distinct`, `min`, `max`, `median`, `most_frequent_value`, `most_frequent_count`, `values_repeated` (optional missing-values extension) |
-| `results/total_bedrooms_method_check.csv` | `method`, `median_abs_pct_error`, `share_within_10pct` (optional missing-values extension) |
-| `results/plots/` | `all_charts.pdf` and PNG charts for scaling runtimes, comparisons and writes, input-order comparisons and runtimes, and repeated values |
-| `results/tables/captions.md` | Captions for the report's results files |
-| `results/tables/scaling_runtime_table.csv` | `n`, `bubble_ms`, `selection_ms`, `merge_ms` |
+| `results/tables/scaling_runtime_table.csv` | `n`, `bubble_ms`, `selection_ms`, `merge_ms`, including the full-dataset row |
 | `results/tables/scaling_comparisons_table.csv` | `n`, `bubble`, `selection`, `merge` comparisons |
-| `results/tables/small_n_table.csv` | `n`, `bubble_us`, `selection_us`, `merge_us` |
-| `results/tables/input_order_table.csv` | `order`, comparisons, writes, passes and runtime in ms for each algorithm |
-| `results/tables/repeated_values_table.csv` | `column`, duplication statistics, sort comparisons, swaps and runtimes |
-| `results/tables/full_size_table.csv` | `algorithm`, `estimate_s`, `actual_s`, `source`, `difference_pct`; Q4 estimates against the full-dataset runs |
-| `results/tables/growth_factors_table.csv` | `doubling`, measured runtimes and comparisons, and theoretical growth |
-| `results/tables/decision_guide_evidence.csv` | `situation`, `source`, `n`, `algorithm`, `comparisons`, `writes`, `passes`, `median_runtime_s`, `fastest` |
+| `results/tables/scaling_small_n_table.csv` | `n`, `bubble_us`, `selection_us`, `merge_us` for the very small sizes (Q5, decision guide) |
+| `results/plots/scaling_runtime.png` | Median runtime against n, n = 250 to 4,000 |
+| `results/plots/scaling_runtime_loglog.png` | Median runtime against n on log-log axes, all sizes plus the full dataset (crossover, Q5) |
+| `results/plots/scaling_comparisons.png` | Comparisons against n |
+| `results/plots/scaling_writes.png` | Writes against n |
+
+### 4.2 step 3: growth factors (Q3)
+
+| File | Columns / contents |
+|---|---|
+| `results/growth_factors.csv` | `algorithm`, `n_from`, `n_to`, `runtime_ratio`, `comparisons_ratio`, `theory_ratio` |
+| `results/tables/scaling_growth_factors_table.csv` | `doubling`, measured runtime and comparisons ratios per sort, and the theoretical growth |
+
+### 4.2 step 4: full dataset, 20,640 values (Q4)
+
+| File | Columns / contents |
+|---|---|
+| `results/bubble_estimate.csv` | `algorithm`, `n`, `runtime_s`, `scale_factor`, `estimate_s`; bubble rows then selection rows, each ending with an average row (the working for the estimates) |
+| `results/full_size.csv` | `algorithm`, `source`, `comparisons`, `writes`, `swaps`, `passes`, `runtime_s`, `runs`; merge sort (measured) and, with `--bubble-check`, the bubble check |
+| `results/tables/scaling_full_size_table.csv` | `algorithm`, `estimate_s`, `actual_s`, `source`, `difference_pct`; estimates against the full-dataset runs |
+
+### 4.3 Input order
+
+| File | Columns / contents |
+|---|---|
+| `results/input_order.csv` | `order`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s` |
+| `results/tables/input_order_table.csv` | `order`, comparisons, writes, passes and runtime in ms for each sort |
+| `results/plots/input_order_comparisons.png` | Comparisons by input order |
+| `results/plots/input_order_runtime.png` | Median runtime by input order |
+
+### 4.4 Repeated values
+
+| File | Columns / contents |
+|---|---|
+| `results/repeated_values.csv` | `column`, `algorithm`, `comparisons`, `writes`, `swaps`, `passes`, `median_runtime_s`, `distinct_values`, `most_frequent_count`, `values_repeated`, `elements_in_repeats`, `equal_pairs` |
+| `results/tables/repeated_values_table.csv` | `column`, duplication statistics, comparisons, swaps and runtimes per sort |
+| `results/plots/repeated_values.png` | Median runtime by column |
+
+### Decision guide
+
+| File | Columns / contents |
+|---|---|
+| `results/tables/decision_guide_evidence.csv` | `situation`, `source`, `n`, `algorithm`, `comparisons`, `writes`, `passes`, `median_runtime_s`, `fastest`; the evidence for each row of the guide, taken by code from the files above |
+
+### Extras
+
+| File | Columns / contents |
+|---|---|
+| `results/memory.csv` | `algorithm`, `peak_kib`; peak memory per sort (Q16) |
+| `results/top_records.csv` | `csv_line`, `median_income`, `population`, `households`, `ocean_proximity` (optional, `--record-lookup`) |
+| `results/total_bedrooms_filled.csv` | `row_number`, `ocean_proximity`, `households`, `ratio_used`, `estimate` (optional, `--missing-values`) |
+| `results/total_bedrooms_before_after.csv` | `version`, `values`, `missing`, `distinct`, `min`, `max`, `median`, `most_frequent_value`, `most_frequent_count`, `values_repeated` (optional, `--missing-values`) |
+| `results/total_bedrooms_method_check.csv` | `method`, `median_abs_pct_error`, `share_within_10pct` (optional, `--missing-values`) |
+
+### Run details
+
+| File | Columns / contents |
+|---|---|
+| `results/run_info.csv` | `setting`, `value`: seed, runs per timing, sizes, columns, optional steps run, Python version, computer, date and time |
+| `results/tables/captions.md` | The title of every results file, built from `src/config.py` |
+| `results/plots/all_charts.pdf` | Every chart, one per page |
 
 ### How to read the results
 
