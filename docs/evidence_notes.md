@@ -22,7 +22,7 @@ Evidence: results/scaling.csv, tables/scaling_runtime_table.csv, tables/scaling_
 
 **Q3. Observed runtime growth factor when n doubles vs theory (about 4x for O(n²), a little over 2x for O(n log n)); why they differ.**
 
-The comparison ratios match theory almost exactly because they are exact counts that depend only on the algorithm. The runtime ratios are close to theory but vary more, because runtime also includes Python overhead, memory and cache effects, and timer noise, which the median of five runs reduces but does not remove. Each size also uses a different random sample.
+The comparison ratio matches theory exactly only for selection sort, because it always makes n(n - 1)/2 comparisons whatever the order of the data. Bubble and merge sort's comparison counts also depend on the order of each sample, and each size uses a different sample, so their ratios move slightly around theory (bubble 3.97 to 4.04, merge 2.21 to 2.30). The runtime ratios vary more, because runtime also includes Python overhead, memory and cache effects, and timer noise, which the median of five runs reduces but does not remove.
 
 Numbers: doubling n from 250 to 4,000, runtime ratios: bubble 3.90 to 4.22, selection 4.00 to 4.15 (theory 4.00), merge 2.16 to 2.23 (theory 2.18 to 2.25). Comparison ratios: bubble 3.97 to 4.04, selection 4.00 to 4.01, merge 2.21 to 2.30.
 
