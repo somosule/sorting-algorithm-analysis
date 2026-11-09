@@ -48,15 +48,51 @@ Evidence: tables/scaling_small_n_table.csv, tables/scaling_runtime_table.csv, pl
 ## Input order (4.3)
 **Q6. Why bubble sort on already sorted data makes about n - 1 comparisons and no swaps.**
 
+On already sorted data, bubble sort's first pass compares each adjacent pair once, which is n - 1 comparisons. No pair is out of order, so nothing is swapped, and early termination stops the sort after that one pass. On random data it needs almost n(n - 1)/2 comparisons and nearly n passes.
+
+Numbers: n = 2,000 sorted: 1,999 comparisons, 0 swaps, 0 writes, 1 pass, 0.103 ms (random: 1,998,594 comparisons, 1,971 passes, 210 ms).
+
+Evidence: results/input_order.csv, tables/input_order_table.csv; workbook 4.3 Input order sheet.
+
 **Q7. Why selection sort makes about n(n - 1)/2 comparisons even when the input is already sorted.**
+
+Selection sort finds the smallest remaining value by scanning the whole unsorted part on every pass, and it has no way to stop early, even when the data is already in order. The number of comparisons is therefore n(n - 1)/2 for every input order. Sorted input only saves writes, because selection sort swaps only when the smallest value is not already in place.
+
+Numbers: n = 2,000 sorted: 1,999,000 comparisons (2,000 × 1,999 / 2), 0 writes, 1,999 passes, 87.6 ms. Random, reverse and nearly sorted also make 1,999,000 comparisons (87.4 to 92.4 ms).
+
+Evidence: results/input_order.csv, tables/input_order_table.csv; workbook 4.3 Input order sheet.
 
 **Q8. Why merge sort's comparison count changes less with input order than bubble sort's.**
 
+Merge sort always splits the list in half and merges the halves back together, so it does the same number of merge levels whatever the input order. Order only changes how many comparisons each merge needs: when one half runs out early, as with sorted or reverse input, the rest of the other half is copied without comparing. Bubble sort's work depends directly on how many pairs are out of order, so it ranges from n - 1 comparisons to n(n - 1)/2.
+
+Numbers: n = 2,000 merge comparisons: sorted 10,864, reverse 11,202, nearly sorted 14,370, random 19,419 (less than 2 times apart); merge writes 21,952 for every order. Bubble comparisons: 1,999 (sorted) to 1,999,000 (reverse), about 1,000 times apart.
+
+Evidence: results/input_order.csv, tables/input_order_table.csv; workbook 4.3 Input order sheet.
+
 **Q9. Best-performing algorithm for each input order, justified in 2-3 sentences.**
+
+Random: merge sort is fastest because it does far fewer comparisons than the O(n²) sorts. Sorted: bubble sort is fastest because one pass with no swaps confirms the order and early termination stops it. Nearly sorted and reverse: merge sort is fastest; bubble sort still needs many passes, and selection sort always makes n(n - 1)/2 comparisons.
+
+Numbers: n = 2,000 median runtime (bubble / selection / merge): random 210 / 87.9 / 2.88 ms; sorted 0.103 / 87.6 / 2.32 ms; nearly sorted 98.0 / 87.4 / 2.49 ms; reverse 290 / 92.4 / 2.32 ms.
+
+Evidence: results/input_order.csv, tables/input_order_table.csv, tables/decision_guide_evidence.csv; workbook 4.3 Input order sheet.
 
 **Q10. Bubble sort's worst-case arrangement among the four inputs, and why.**
 
+Reverse order is bubble sort's worst case, because every pair of different values is out of order and each one has to be swapped. Each pass only moves one value to its final place, so it needs the most passes, and early termination never helps. Swaps are slightly fewer than n(n - 1)/2 because equal values in median_income are not swapped.
+
+Numbers: n = 2,000 reverse: 1,999,000 comparisons, 1,998,657 swaps, 3,997,314 writes, 1,999 passes, 290 ms (slowest of all orders; random 210 ms).
+
+Evidence: results/input_order.csv, tables/input_order_table.csv; workbook 4.3 Input order sheet.
+
 **Q11. Does early termination help much on nearly sorted input? Why a few out-of-place elements can still force many passes.**
+
+Early termination helps only a little on nearly sorted input. Bubble sort moves a large value to the end quickly, but a small value near the end moves only one position towards the front per pass, so a few out-of-place values can force over a thousand passes. Runtime is about half of random because there are far fewer swaps, not because many passes are skipped.
+
+Numbers: n = 2,000 nearly sorted (20 swaps): 1,542 passes, 1,894,347 comparisons, 24,683 swaps, 98.0 ms. Random: 1,971 passes, 1,998,594 comparisons, 1,012,299 swaps, 210 ms. Sorted: 1 pass.
+
+Evidence: results/input_order.csv, tables/input_order_table.csv; workbook 4.3 Input order sheet.
 
 ## Repeated values (4.4)
 **Q12. Comparisons, writes and runtimes across the three columns; which observations come from duplication and which from input order or implementation.**
