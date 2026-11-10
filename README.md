@@ -21,7 +21,7 @@ https://raw.githubusercontent.com/ageron/handson-ml2/master/datasets/housing/hou
 
 Note the hyphen in `handson-ml2`; the link often loses it when copied from the PDF. Save the file as `housing.csv` in the repository root without opening and re-saving it in Excel.
 
-The experiments use three columns: `median_income` (scaling and input order), plus `housing_median_age` and `median_house_value` (repeated values). `total_bedrooms` has 207 blank values. It is left out of the main experiments and used only in the optional missing-values extension (`RUN_MISSING_VALUES` in `config.py`).
+The experiments use three columns: `median_income` (scaling and input order), plus `housing_median_age` and `median_house_value` (repeated values). `total_bedrooms` has 207 blank values. It is left out of the main experiments and used only in the optional missing-values extension (`--missing-values`).
 
 ## Run
 
@@ -47,7 +47,7 @@ python -m unittest discover -v      # tests
 
 The official run (`python3 main.py --all-extras`) took **43.8 seconds** on a **MacBook Air (Apple silicon, macOS 26.3.1)** using **Python 3.14.7**; about 23 seconds of that is the optional bubble check, so a plain `python3 main.py` takes about 20 seconds. Runtime varies by computer and load. The run records its exact date, time, Python version, and computer in `results/run_info.csv`.
 
-The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. The full-size check normally measures merge sort; the optional bubble check runs once only when `RUN_BUBBLE_FULL` is enabled after the bubble estimate is saved. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The three optional steps are off by default. Switch them on with command-line options, with no need to edit any code:
+The command runs the dataset profile, scaling, input-order and repeated-values experiments, growth factors, bubble estimate, full-size check, memory measurement, and plots, in that order. The full-size check normally measures merge sort; the optional bubble check runs once only with `--bubble-check` (or `--all-extras`), after the bubble estimate is saved. Each step reports its row or file count, output path, and elapsed time. The final lines give the paths to the combined chart PDF and report captions, followed by total run time. If matplotlib is not installed, plots are skipped with a message. The three optional steps are off by default. Switch them on with command-line options, with no need to edit any code:
 
 | Option | Optional step |
 |---|---|
@@ -56,7 +56,7 @@ The command runs the dataset profile, scaling, input-order and repeated-values e
 | `--record-lookup` | Runs the record lookup extension |
 | `--all-extras` | All three; this is the official run used for the report |
 
-Options can be combined, for example `python3 main.py --bubble-check --record-lookup`. A run does not delete files written by an earlier run, so to start clean (as for the official run), clear the results first: `find results -type f ! -name ".gitkeep" -delete`. The defaults are the switches `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` in `src/config.py`. The run prints which optional steps are on and records them in `results/run_info.csv` (`extras_run`).
+Each optional step has its own option because the steps are independent: the bubble check is optional in the brief and the other two are extensions, so a user can run, time or test one step without the others, and the main results are the same either way. Options can be combined, for example `python3 main.py --bubble-check --record-lookup`. A run does not delete files written by an earlier run, so to start clean (as for the official run), clear the results first: `find results -type f ! -name ".gitkeep" -delete`. The defaults are the switches `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` in `src/config.py`. The run prints which optional steps are on and records them in `results/run_info.csv` (`extras_run`).
 
 Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
