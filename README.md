@@ -58,7 +58,7 @@ The command runs the dataset profile, scaling, input-order and repeated-values e
 
 Each optional step has its own option because the steps are independent: the bubble check is optional in the brief and the other two are extensions, so a user can run, time or test one step without the others, and the main results are the same either way. Options can be combined, for example `python3 main.py --bubble-check --record-lookup`. A run does not delete files written by an earlier run, so to start clean (as for the official run), clear the results first: `find results -type f ! -name ".gitkeep" -delete`. The defaults are the switches `RUN_BUBBLE_FULL`, `RUN_MISSING_VALUES` and `RUN_RECORD_LOOKUP` in `src/config.py`. The run prints which optional steps are on and records them in `results/run_info.csv` (`extras_run`).
 
-Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed. It reports results in the terminal only and leaves the official files in `results/` unchanged.
+Use `python3 main.py --interactive` on macOS or `python main.py --interactive` on Windows for exploratory runs with selectable experiment sizes, columns, and seed, or for a record lookup that prints the top rows of any numeric column. It reports results in the terminal only and leaves the official files in `results/` unchanged.
 
 ## Outputs
 
