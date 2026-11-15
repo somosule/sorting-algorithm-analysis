@@ -6,7 +6,8 @@ row numbers using the column as the key, so every original row can be looked up.
 It uses the same merge logic as merge_sort (<= keeps equal values in their
 original order, so the sort is stable) without counters, and runs after the timed
 experiments. housing.csv is never changed; the output goes only to
-results/top_records.csv.
+results/top_records.csv. The interactive mode (D30) uses find_top_records(),
+which returns the same rows for any numeric column without writing a file.
 """
 import csv
 
@@ -17,12 +18,13 @@ TOP_FILE = "top_records.csv"
 SHOW = ("population", "households", "ocean_proximity")
 
 
-def top_records(path, column, k=5, show=SHOW):
-    """Save and return the k rows with the highest value in column, highest first.
+def find_top_records(path, column, k=5, show=SHOW):
+    """Return the k rows with the highest value in column, highest first.
 
-    Rows with a blank or non-numeric value in column are left out. Each result
-    gives csv_line (the line number in housing.csv, header = line 1), the
-    value, and the fields in show. Ties keep the original file order.
+    Nothing is written, so the interactive mode can use it (D30). Rows with a
+    blank or non-numeric value in column are left out. Each result gives
+    csv_line (the line number in housing.csv, header = line 1), the value, and
+    the fields in show. Ties keep the original file order.
     """
     rows = load_rows(path)
     numbered = [(number, _to_float(row[column])) for number, row in enumerate(rows)]
@@ -35,7 +37,15 @@ def top_records(path, column, k=5, show=SHOW):
         record = {"csv_line": number + 2, column: value}
         record.update({field: rows[number][field] for field in show})
         results.append(record)
+    return results
 
+
+def top_records(path, column, k=5, show=SHOW):
+    """Save and return the k rows with the highest value in column, highest first.
+
+    The official step: find_top_records() plus results/top_records.csv.
+    """
+    results = find_top_records(path, column, k, show)
     _write(results, ("csv_line", column, *show))
     print(f"Record lookup: top {len(results)} rows by {column} -> results/{TOP_FILE}")
     return results

@@ -13,6 +13,8 @@ from src.growth_estimate import bubble_estimate
 from src.interactive import (
     ALL_SCALING_SIZES,
     _ask_experiment,
+    _ask_lookup_rows,
+    _ask_task,
     _ask_missing_version,
     _ask_sizes,
     _calculate_rows,
@@ -20,6 +22,7 @@ from src.interactive import (
     run_interactive,
 )
 from src.load_data import load_column
+from src.record_lookup import find_top_records
 from src.sorts import ALGORITHMS
 
 
@@ -117,6 +120,7 @@ class TestInteractiveCalculations(unittest.TestCase):
         columns = config.COLUMNS
         rows = [{"column": column} for column in columns]
         with (
+            patch("src.interactive._ask_task", return_value="experiment"),
             patch("src.interactive._ask_experiment", return_value="repeated values"),
             patch("src.interactive._ask_sizes", return_value=(config.ORDER_N,)),
             patch("src.interactive._ask_seed", return_value=config.SEED),
@@ -143,7 +147,7 @@ class TestInteractiveCalculations(unittest.TestCase):
         run_interactive.assert_called_once_with()
 
     def test_interactive_flow_only_prints_and_does_not_create_results(self):
-        answers = ("1", "a", "", "", "n")
+        answers = ("", "1", "a", "", "", "n")
         with tempfile.TemporaryDirectory() as directory:
             results_dir = Path(directory) / "results"
             with patch.object(config, "RESULTS_DIR", results_dir):
@@ -151,6 +155,46 @@ class TestInteractiveCalculations(unittest.TestCase):
                     with redirect_stdout(io.StringIO()):
                         run_interactive()
             self.assertFalse(results_dir.exists())
+
+    def test_record_lookup_default_matches_official_result(self):
+        results = find_top_records(config.DATA_PATH, config.SCALING_COLUMN)
+        self.assertEqual(
+            [row["csv_line"] for row in results], [1568, 4354, 4606, 4607, 4608]
+        )
+        self.assertTrue(all(row["median_income"] == 15.0001 for row in results))
+
+    def test_record_lookup_flow_only_prints_and_does_not_create_results(self):
+        answers = ("2", "population", "3", "n")
+        output = io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            results_dir = Path(directory) / "results"
+            with patch.object(config, "RESULTS_DIR", results_dir):
+                with patch("builtins.input", side_effect=answers):
+                    with redirect_stdout(output):
+                        run_interactive()
+            self.assertFalse(results_dir.exists())
+        printed = output.getvalue()
+        self.assertIn("Record lookup, top 3 rows by population", printed)
+        self.assertIn("35682.0", printed)
+        heading = [line for line in printed.splitlines() if "csv_line" in line][0]
+        self.assertEqual(heading.split(), ["csv_line", "population", "households", "ocean_proximity"])
+
+    def test_record_lookup_prompts_retry_and_accept_defaults(self):
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=("3", "")):
+            with redirect_stdout(output):
+                task = _ask_task()
+        self.assertEqual(task, "experiment")
+        self.assertIn("Please choose 1 or 2.", output.getvalue())
+
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=("abc", "0", "21", "")):
+            with redirect_stdout(output):
+                rows = _ask_lookup_rows()
+        self.assertEqual(rows, 5)
+        self.assertEqual(
+            output.getvalue().count("Please enter a whole number from 1 to 20."), 3
+        )
 
     def test_quadratic_estimator_accepts_selection_rows(self):
         rows = [
