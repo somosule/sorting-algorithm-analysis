@@ -1,9 +1,14 @@
 """Tests for the record lookup extension (src/record_lookup.py, D08)."""
 import csv
+import io
+import tempfile
 import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+from unittest.mock import patch
 
 from src import config
-from src.record_lookup import sort_row_numbers, top_records
+from src.record_lookup import find_top_records, sort_row_numbers, top_records
 
 
 class TestSortRowNumbers(unittest.TestCase):
@@ -25,7 +30,7 @@ class TestSortRowNumbers(unittest.TestCase):
 class TestTopRecords(unittest.TestCase):
 
     def test_matches_the_data(self):
-        results = top_records(config.DATA_PATH, "median_income", k=5)
+        results = find_top_records(config.DATA_PATH, "median_income", k=5)
         with open(config.DATA_PATH, encoding="utf-8") as file:
             rows = list(csv.DictReader(file))
         expected = sorted(range(len(rows)), key=lambda i: -float(rows[i]["median_income"]))[:5]
@@ -33,19 +38,26 @@ class TestTopRecords(unittest.TestCase):
         self.assertEqual(results[0]["median_income"], 15.0001)
 
     def test_ties_keep_file_order(self):
-        results = top_records(config.DATA_PATH, "median_house_value", k=3)
+        results = find_top_records(config.DATA_PATH, "median_house_value", k=3)
         lines = [r["csv_line"] for r in results]
         self.assertTrue(all(r["median_house_value"] == 500001.0 for r in results))
         self.assertEqual(lines, sorted(lines))
 
     def test_blanks_are_skipped(self):
-        results = top_records(config.DATA_PATH, "total_bedrooms", k=3)
+        results = find_top_records(config.DATA_PATH, "total_bedrooms", k=3)
         self.assertEqual(len(results), 3)
 
     def test_saves_the_file(self):
-        top_records(config.DATA_PATH, "median_income", k=2)
-        with open(config.RESULTS_DIR / "top_records.csv", encoding="utf-8") as file:
-            self.assertEqual(len(list(csv.DictReader(file))), 2)
+        # Written to a temporary folder, so the official results file is never touched.
+        with tempfile.TemporaryDirectory() as directory:
+            results_dir = Path(directory)
+            with patch.object(config, "RESULTS_DIR", results_dir):
+                with redirect_stdout(io.StringIO()):
+                    results = top_records(config.DATA_PATH, "median_income", k=2)
+            with open(results_dir / "top_records.csv", encoding="utf-8") as file:
+                saved = list(csv.DictReader(file))
+        self.assertEqual(len(saved), 2)
+        self.assertEqual([int(row["csv_line"]) for row in saved], [r["csv_line"] for r in results])
 
 
 if __name__ == "__main__":

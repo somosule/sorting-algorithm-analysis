@@ -8,6 +8,7 @@ from src.experiments import build_orders
 from src.growth_estimate import bubble_estimate, growth_factors
 from src.load_data import load_column
 from src.measure import run_algorithm, verify_sorted
+from src.record_lookup import SHOW, find_top_records
 from src.sorts import ALGORITHMS
 
 NUMERIC_COLUMNS = (
@@ -26,6 +27,8 @@ CROSSOVER_SIZES = (50, 100)
 LARGE_SIZES = (250, 500, 1000, 2000, 4000)
 ALL_SCALING_SIZES = TINY_SIZES + CROSSOVER_SIZES + LARGE_SIZES
 SAMPLE_SIZES = (1000, 2000, 4000)
+LOOKUP_DEFAULT_ROWS = 5
+LOOKUP_MAX_ROWS = 20
 
 
 def _calculate_rows(experiment, sizes, seed, values_by_column):
@@ -112,6 +115,18 @@ def _ask_experiment():
         {"1": "scaling", "2": "input order", "3": "repeated values"},
         "scaling",
         "Please choose 1, 2, or 3.",
+    )
+
+
+def _ask_task():
+    print("What would you like to do?")
+    print("  1) Run an experiment [default]")
+    print("  2) Record lookup (extension)")
+    return _prompt_choice(
+        "Choose [1]: ",
+        {"1": "experiment", "2": "record lookup"},
+        "experiment",
+        "Please choose 1 or 2.",
     )
 
 
@@ -371,7 +386,49 @@ def _run_full_column_check(values, estimates):
         )
 
 
+def _ask_lookup_rows():
+    while True:
+        answer = input(
+            f"How many rows, 1 to {LOOKUP_MAX_ROWS} [{LOOKUP_DEFAULT_ROWS}]: "
+        ).strip()
+        if not answer:
+            return LOOKUP_DEFAULT_ROWS
+        if answer.isdigit() and 1 <= int(answer) <= LOOKUP_MAX_ROWS:
+            return int(answer)
+        print(f"Please enter a whole number from 1 to {LOOKUP_MAX_ROWS}.")
+
+
+def _run_record_lookup():
+    """Print the rows with the highest values in one column; writes no file."""
+    column = _ask_column()
+    k = _ask_lookup_rows()
+    show = tuple(field for field in SHOW if field != column)
+    results = find_top_records(config.DATA_PATH, column, k, show)
+
+    print(
+        f"Record lookup, top {len(results)} rows by {column} (exploration; "
+        f"the official run uses {config.SCALING_COLUMN}, top "
+        f"{LOOKUP_DEFAULT_ROWS})"
+    )
+    fields = ("csv_line", column, *show)
+    widths = [
+        max(len(field), *(len(str(row[field])) for row in results)) + 2
+        for field in fields
+    ]
+    print("  " + "".join(f"{field:<{width}}" for field, width in zip(fields, widths)))
+    for row in results:
+        print(
+            "  "
+            + "".join(f"{str(row[field]):<{width}}" for field, width in zip(fields, widths))
+        )
+    print("csv_line is the line in housing.csv (the header is line 1).")
+    print("Equal values are listed in file order; blank values are left out.")
+
+
 def _run_one_exploration():
+    if _ask_task() == "record lookup":
+        _run_record_lookup()
+        return
     experiment = _ask_experiment()
     sizes = _ask_sizes(experiment)
     seed = _ask_seed()
