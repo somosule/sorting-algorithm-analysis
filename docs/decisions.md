@@ -44,6 +44,7 @@ Format:
 | D27 | Interactive mode: python3 main.py --interactive | Agreed (Thu 5 Nov), requested by Dr Khan |
 | D28 | Command-line options for the optional steps (--all-extras for the official run) | Agreed (Sat 7 Nov) |
 | D29 | Results workbook collating every table and chart | Agreed (Sun 8 Nov) |
+| D30 | Record lookup in the interactive mode, for any numeric column | Agreed (Sun 15 Nov) |
 
 ## D01: housing.csv committed in the repository root
 **Decision:** `housing.csv` sits next to `main.py` and is committed.
@@ -204,3 +205,7 @@ All three sorts always run, and the table shows comparisons, writes, swaps, pass
 **Why:** The CSVs are plain text by design (D10, D24), so they cannot carry titles or formatting, and there are over 20 results files. One workbook organised by section of the brief makes the results easy to find, read and copy into the report and slides, and it is rebuilt by code on every run, so it always matches the results.
 **Report:** Section 2: "All tables and charts are also collated in results/results_workbook.xlsx." The explanations for each question are written in the report; the workbook gives the evidence.
 
+## D30: Record lookup in the interactive mode
+**Decision:** `python3 main.py --interactive` now asks first whether to run an experiment (the default) or a record lookup. The record lookup asks for any numeric column and the number of rows (1 to 20, default 5), then prints the top records with their CSV line, population, households and ocean_proximity. `src/record_lookup.py` is split into `find_top_records()`, which finds the rows without writing anything, and `top_records()`, which also saves `results/top_records.csv`. The official run still calls `top_records()` on median_income (D08), so the official results are unchanged. The file-saving test now writes to a temporary folder, so running the tests no longer overwrites `results/top_records.csv`. Three new tests; 76 in total.
+**Why:** The official lookup runs on one column, median_income, where the top values are all at the cap. Running it on any column shows the technique on uncapped data (for example, population) and answers "does it work on other columns?" without changing the official results or rerunning the official run.
+**Report:** Section 2: the test count is 76. Optionally, one clause in the interactive mode paragraph: "and look up the top records in any numeric column".

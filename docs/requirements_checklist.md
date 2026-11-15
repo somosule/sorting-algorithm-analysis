@@ -4,7 +4,7 @@ Every requirement in the Project 2 brief, mapped to its task in the team plan. T
 
 **Requirements come from the brief. The plan is checked against the brief, never the reverse.**
 
-**Code complete: Sun 8 Nov 2026.** Every code, results and repository item is ticked: 73 tests pass, the official results come from one run of `python3 main.py --all-extras` (recorded in `results/run_info.csv`), and a fresh clone reproduced identical counts. The numbered questions (Q3 to Q17) and the report items are ticked once they are answered in the report; the evidence for each is in `results/results_workbook.xlsx` (Questions sheet).
+**Code complete: Sun 8 Nov 2026.** Every code, results and repository item is ticked: 73 tests passed at code complete (76 after the interactive record lookup was added on Sun 15 Nov, D30), the official results come from one run of `python3 main.py --all-extras` (recorded in `results/run_info.csv`), and a fresh clone reproduced identical counts. The numbered questions (Q3 to Q17) and the report items are ticked once they are answered in the report; the evidence for each is in `results/results_workbook.xlsx` (Questions sheet).
 
 ## Code and data (Sections 2-4.1)
 - [x] Bubble, selection and merge sort implemented from scratch → P2 · Patrick
@@ -58,6 +58,7 @@ Every requirement in the Project 2 brief, mapped to its task in the team plan. T
 - [x] README: obtaining housing.csv, running the code, reading the outputs → P8 · Patrick
 - [x] Fresh clone reproduces identical counts → A2 · All
 - [x] Interactive mode: the user chooses n, the column and the seed (Dr Khan's request, D27) → P7 · Patrick
+- [x] Interactive record lookup on any numeric column; official results unchanged (D30) → Sarah
 
 ## Report (Section 5)
 - [ ] Max 10 pages excl. references, peer form, appendix; single column; Arial 11 → S4 · Sarah

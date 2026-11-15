@@ -27,7 +27,7 @@ Report Section 2 reference: implementation details, design flow, and reproducibi
 - `src/measure.py` times sort calls with `time.perf_counter()`. Loading and correctness checks are outside the timed interval. The sort's initial input copy is inside the timed call but is not counted as a write.
 - Each input is run five times and the median duration is reported. For n <= 20, each timed interval loops over 1,000 calls and reports the average time per call. Operation counts must match across repeats or the run raises an error.
 - Outside the timer, each result is compared with `sorted(original)`, and the original input is checked for mutation. `sorted()` is used for verification only, not by the sorting algorithms.
-- The automated suite has 73 tests, run with `python -m unittest discover -v`. It covers sorting, data loading and profiling, experiment structure, workbook generation, command-line options, run metadata, and interactive and optional-extension behavior.
+- The automated suite has 76 tests, run with `python -m unittest discover -v`. It covers sorting, data loading and profiling, experiment structure, workbook generation, command-line options, run metadata, and interactive and optional-extension behavior.
 
 ## `main.py` call order and outputs
 
@@ -52,7 +52,7 @@ The full-size step sorts all 20,640 `median_income` values with merge sort. The 
 
 - `python main.py` runs the analysis with the default optional steps off. `python main.py --help` lists the options.
 - `--bubble-check` runs bubble sort once on all values after its estimate; `--missing-values` runs the missing-data extension; `--record-lookup` runs the record lookup extension. These options can be combined. `--all-extras` enables all three and is the official report run. Enabled optional steps are listed at startup and recorded in `results/run_info.csv`.
-- `python main.py --interactive` starts the exploratory menu instead of the full pipeline. It offers scaling, input-order, or repeated-values experiments; preset sizes; a selectable seed; and one or three numeric columns as appropriate. Pressing Enter selects the displayed defaults. It prints counts and timings to the terminal and does not change the official result files.
+- `python main.py --interactive` starts the exploratory menu instead of the full pipeline. Its first question is whether to run an experiment (the default) or a record lookup, which asks for any numeric column and the number of rows (1 to 20, default 5) and prints the top records. The experiments offered are scaling, input-order, or repeated-values experiments; preset sizes; a selectable seed; and one or three numeric columns as appropriate. Pressing Enter selects the displayed defaults. It prints counts and timings to the terminal and does not change the official result files.
 - For larger interactive scaling choices, it also shows growth estimates and asks, defaulting to No, whether to run all three sorts on the full column as an estimate check. If `total_bedrooms` is selected, it offers raw values, ratio imputation, or a single median fill.
 - `python -m src.make_workbook` rebuilds only the workbook from current result files. `python -m unittest discover -v` runs the tests.
 
